@@ -1,16 +1,25 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/extensions/extensions.dart';
-
-
 import 'config/constants/env_constants.dart';
+import 'core/local/locale_controller.dart';
+import 'core/local/locales.dart';
 
 void main() async {
   await initModule();
-  runApp(const MyApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: localeSettings.locales,
+      path: translationPath,
+      fallbackLocale: localeSettings.defaultLocale,
+      startLocale: localeSettings.defaultLocale,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -19,10 +28,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialRoute: Routes.login,
-      onGenerateRoute: RouteGenerator.getRoute,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
       debugShowCheckedModeBanner: dotenv.env[EnvConstants.debug].onNullBool(),
-      // home: LoginView(),
+      locale: localeSettings.defaultLocale,
+      onGenerateRoute: RouteGenerator.getRoute,
+      initialRoute: Routes.popularDoctors,
     );
   }
 }

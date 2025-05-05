@@ -7,6 +7,10 @@ class ManagerRadius {
   static double r6 = 6.0;
   static double r12 = 12.0;
   static double r25 = 25.0;
+  static double r28 = 28.0;
+  static double r30 = 30.0;
   static double r50 = 50.0;
+  static double r100 = 100.0;
+
 
 }

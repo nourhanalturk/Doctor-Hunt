@@ -54,4 +54,17 @@ class AppSettingsPrefs {
         .getString(SharedPrefsConstants.locale)
         .pareWithDefaultLocale();
   }
+
+  Future<void> setOutBoardingViewed() async {
+    await _sharedPreferences.setBool(
+        SharedPrefsConstants.outBoardingViewed, true);
+  }
+
+  bool getOutBoardingViewed() {
+    return _sharedPreferences
+        .getBool(
+          SharedPrefsConstants.outBoardingViewed,
+        )
+        .onNull();
+  }
 }

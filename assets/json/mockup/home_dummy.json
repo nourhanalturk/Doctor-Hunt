@@ -1,0 +1,61 @@
+{
+  "live_doctors": [
+    {
+      "id": 1,
+      "name": "Dr. Susan Lee",
+      "image": "https://example.com/images/doc1.jpg",
+      "is_live": true
+    },
+    {
+      "id": 2,
+      "name": "Dr. Amanda Smith",
+      "image": "https://example.com/images/doc2.jpg",
+      "is_live": true
+    },
+    {
+      "id": 3,
+      "name": "Dr. Ken Adams",
+      "image": "https://example.com/images/doc3.jpg",
+      "is_live": true
+    }
+  ],
+  "popular_doctors": [
+    {
+      "id": 4,
+      "name": "Dr. Fillerup Grab",
+      "specialty": "Medicine Specialist",
+      "image": "assets/images/profile_doctor_image.jpg",
+      "rating": 4.5
+    },
+    {
+      "id": 5,
+      "name": "Dr. Blessing",
+      "specialty": "Dentist Specialist",
+      "image": "assets/images/image.png",
+      "rating": 4.8
+    }
+  ],
+  "featured_doctors": [
+    {
+      "id": 6,
+      "name": "Dr. Crick",
+      "coast_per_hour": "300",
+      "rating": 3.7,
+      "image": "assets/images/image.png"
+    },
+    {
+      "id": 7,
+      "name": "Dr. Strain",
+      "coast_per_hour": "500",
+      "rating": 3.0,
+      "image": "assets/images/image.png"
+    },
+    {
+      "id": 8,
+      "name": "Dr. Lachinet",
+      "coast_per_hour": "100",
+      "rating": 2.9,
+      "image": "assets/images/image.png"
+    }
+  ]
+}

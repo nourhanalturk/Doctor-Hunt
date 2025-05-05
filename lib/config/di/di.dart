@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import '../../core/internet_checker/interent_checker.dart';
 import '../../core/network/app_api.dart';
@@ -11,12 +12,24 @@ import '../../core/network/dio_factory.dart';
 import '../constants/constants.dart';
 
 final instance = GetIt.instance;
+final supabase = Supabase.instance.client;
 
 initModule() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
 
   final SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+  await Supabase.initialize(
+    url: Constants.supaBaseUrl,
+    anonKey: Constants.supaAnonKey,
+    debug: true,
+  );
+  // Register Supabase Client
+  if (!GetIt.I.isRegistered<SupabaseClient>()) {
+    instance.registerLazySingleton<SupabaseClient>(
+          () => Supabase.instance.client,
+    );
+  }
 
 
   if (!GetIt.I.isRegistered<SharedPreferences>()) {

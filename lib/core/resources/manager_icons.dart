@@ -11,4 +11,12 @@ class ManagerIcons {
   static IconData settings = Icons.settings;
   static IconData search = Icons.search;
   static IconData edit = Icons.edit_outlined;
+  static IconData visibility_off = Icons.visibility_off;
+  static IconData visibility = Icons.visibility;
+  static IconData clear = Icons.clear;
+  static IconData favorite = Icons.favorite_border;
+  static IconData star = Icons.star;
+  static IconData outlineStar = Icons.star_border;
+
+
 }

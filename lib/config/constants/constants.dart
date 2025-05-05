@@ -7,6 +7,10 @@ class Constants {
   static const String token = "token";
 
 
+  ///Supabase constants
+  static const String supaBaseUrl = 'https://xzdxzzvtwrqyxfbimejz.supabase.co';
+  static const String supaAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6ZHh6enZ0d3JxeXhmYmltZWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3NTM3ODAsImV4cCI6MjA2MTMyOTc4MH0.uvTWs6yT7QGmj-ky_v4nmHDHnQNhHIEXOsuBTucb6mU';
+
 
   /// Api Config
   static const int outBoardingDurationTime = 1;
@@ -29,5 +33,7 @@ class Constants {
   static const String englishName = 'English';
   static const String english = 'en';
   static const String arabic = 'ar';
+
+  static const int splashTimeSecond = 2;
 
 }
