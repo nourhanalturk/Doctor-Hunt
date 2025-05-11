@@ -21,21 +21,6 @@ class OutBoardingView extends StatelessWidget {
         builder: (controller) {
           return Column(
             children: [
-              // Stack(
-              //   children: [
-              //     Positioned(
-              //       left: -104,
-              //       top: -20,
-              //       child: Container(
-              //         width: ManagerWidth.w300,
-              //         height: ManagerHeight.h300,
-              //         decoration: BoxDecoration(
-              //           color: ManagerColors.green,
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
               Expanded(
                 child: PageView(
                   controller: controller.pageController,

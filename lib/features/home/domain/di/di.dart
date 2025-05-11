@@ -15,7 +15,7 @@ initHomeRequest() {
 
   if (!GetIt.I.isRegistered<HomeRepository>()) {
     instance.registerLazySingleton<HomeRepository>(
-            () => HomeRepositoryImpl(instance()));
+            () => HomeRepositoryImpl(instance(),instance()));
   }
 
   if (!GetIt.I.isRegistered<HomeUsecase>()) {

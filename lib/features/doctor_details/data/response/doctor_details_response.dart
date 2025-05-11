@@ -24,7 +24,7 @@ class DoctorDetailsResponse {
   final int? patients;
 
   @JsonKey(name: ResponseConstants.location)
-  final String? location;
+  final String location;
   @JsonKey(name: ResponseConstants.coastPerHour)
   final double? coastPerHour;
   @JsonKey(name: ResponseConstants.services)

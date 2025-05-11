@@ -13,8 +13,6 @@ class ManagerStrings {
   static const String refreshFailed = "refreshing failed";
   static const String tokenExpired = "access token is expired";
 
-
-
   static String get question => tr('question');
 
   static String get noContent => tr('noContent');
@@ -221,36 +219,74 @@ class ManagerStrings {
   static String get yearsOfExperience => tr('yearsOfExperience');
 
   static String get doctorPatientStories => tr('doctorPatientStories');
-  static String get running => tr('running');
-  static String get ongoing => tr('ongoing');
-  static String get patient => tr('patient');
-  static String get services => tr('services');
 
+  static String get running => tr('running');
+
+  static String get ongoing => tr('ongoing');
+
+  static String get patient => tr('patient');
+
+  static String get services => tr('services');
 
   static String get doctorDetails => tr('doctorDetails');
 
   static String get emailVerificationLinkSent =>
       tr('emailVerificationLinkSent');
+
   static String get threeHundred => tr('300');
+
   static String get appointment => tr('appointment');
+
   static String get appointmentFor => tr('appointmentFor');
 
-
-
   static String get patientName => tr('patientName');
+
   static String get contactNumber => tr('contactNumber');
+
   static String get whoIsPatient => tr('whoIsThisPatient?');
+
   static String get add => tr('add');
+
   static String get next => tr('next');
+
   static String get thankYou => tr('thankYou');
-  static String get yourAppointmentSuccessful => tr('yourAppointmentSuccessful');
+
+  static String get yourAppointmentSuccessful =>
+      tr('yourAppointmentSuccessful');
+
   static String get youBookAnAppointmentWith => tr('youBookAnAppointmentWith');
+
   static String get on => tr('on');
+
   static String get withDoctor => tr('with');
+
   static String get at => tr('at');
+
   static String get done => tr('done');
+
   static String get editYourAppointment => tr('editYourAppointment');
+
   static String get category => tr('category');
 
+  static String get am => tr('am');
 
+  static String get pm => tr('pm');
+
+  static String get confirm => tr('confirm');
+
+  static String get noAvailableTimeForTheDoctorToday =>
+      tr('noAvailableTimeForTheDoctorToday');
+
+  static String get failedToUpdateDoctorsAvailableTime =>
+      tr('failedToUpdateDoctorsAvailableTime');
+
+  static String get thereIsNoFavorites => tr('thereIsNoFavorites');
+
+  static String get searchDoctors => tr('searchDoctors');
+
+  static String get availableTime => tr('availableTime');
+
+  static String get reminderMeBefore => tr('reminderMeBefore');
+
+  static String get minit => tr('minit');
 }

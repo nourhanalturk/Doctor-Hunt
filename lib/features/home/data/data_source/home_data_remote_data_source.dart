@@ -5,7 +5,6 @@ import '../response/home_data_response.dart';
 
 abstract class HomeRemoteDataSource {
   Future<List<HomeResponse>> getHomeSections();
- // Future<void> addHomeSection(Map<String, dynamic> data);
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
@@ -15,9 +14,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
 
   @override
   Future<List<HomeResponse>> getHomeSections() async {
-    final response = await supabase
-        .from('home_data')
-        .select('''
+    final response = await supabase.from('home_data').select('''
         id,
         created_at,
         section,
@@ -27,16 +24,8 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
         specialty,
         rating,
         coast_per_hour
-    ''')
-        .order('created_at', ascending: false);
+    ''').order('created_at', ascending: false);
 
-    return response
-        .map((json) => HomeResponse.fromJson(json))
-        .toList();
+    return response.map((json) => HomeResponse.fromJson(json)).toList();
   }
-
-  // @override
-  // Future<void> addHomeSection(Map<String, dynamic> data) async {
-  //   await _client.from('home_data').insert(data);
-  // }
 }

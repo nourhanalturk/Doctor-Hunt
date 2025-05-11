@@ -25,7 +25,7 @@ Widget successAppointmentDialog({
       ),
       backgroundColor: ManagerColors.white,
       child: Container(
-        height: size.height * ManagerOpacity.op0_7,
+        height: size.height * ManagerOpacity.op0_8,
         width: size.width * 1.0,
         child: Padding(
           padding: EdgeInsets.all(
@@ -69,7 +69,7 @@ Widget successAppointmentDialog({
               Text(
                 ManagerStrings.yourAppointmentSuccessful,
                 style: getRegularTextStyle(
-                  fontSize: ManagerFontSize.s20,
+                  fontSize: ManagerFontSize.s16,
                   color: ManagerColors.blueBell,
                 ),
               ),

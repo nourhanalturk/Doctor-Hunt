@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tender/core/extensions/extensions.dart';
-
 import '../resources/manager_colors.dart';
 import '../resources/manager_font_size.dart';
 import '../resources/manager_font_weight.dart';

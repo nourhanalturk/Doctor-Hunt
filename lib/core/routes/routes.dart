@@ -11,7 +11,7 @@ import 'package:tender/features/register/domain/di/di.dart';
 import 'package:tender/features/register/presentation/view/register_view.dart';
 import 'package:tender/features/splash/domain/di.dart';
 import 'package:tender/features/splash/presentation/view/splash_view.dart';
-import '../../features/doctor_appointment/domain/di/di.dart';
+import '../../features/doctor_appointment/model/di/di.dart';
 import '../../features/doctor_appointment/presentation/view/appointment_view.dart';
 import '../../features/home/domain/di/di.dart';
 import '../../features/home/presentation/view/home_view.dart';
@@ -72,7 +72,7 @@ class RouteGenerator {
           builder: (context) => const DoctorDetailsView(),
         );
       case Routes.doctorAppointment:
-        initAppointment();
+        initDoctorAppointments();
         return MaterialPageRoute(
           builder: (context) => const DoctorAppointmentView(),
         );

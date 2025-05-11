@@ -13,6 +13,7 @@ class Constants {
 
 
   /// Api Config
+  static const String flutterMapUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   static const int outBoardingDurationTime = 1;
   static const int sessionFinishedDuration = 2;
   static const int sendTimeOutDuration = 120;

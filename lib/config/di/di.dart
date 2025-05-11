@@ -40,12 +40,6 @@ initModule() async {
     instance.registerLazySingleton<AppSettingsPrefs>(
             () => AppSettingsPrefs(instance()));
   }
-  // This is not important code
-  // @todo: remove this code
-  // AppSettingsPrefs _app = instance<AppSettingsPrefs>();
-  // var pref = await SharedPreferences.getInstance();
-  // pref.clear();
-
   if (!GetIt.I.isRegistered<NetworkInfo>()) {
     GetIt.I.registerLazySingleton<NetworkInfo>(
           () => NetworkInfoImpl(
@@ -57,7 +51,7 @@ initModule() async {
               ),
               timeout: const Duration(
                 seconds: Constants.connectionTimeOut,
-              ), // Set your desired timeout here
+              ),
             )
           ],
         ),

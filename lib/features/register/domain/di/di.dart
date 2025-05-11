@@ -1,47 +1,46 @@
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tender/features/home/data/repository/home_data_repository.dart';
 import 'package:tender/features/register/presentation/controller/register_controller.dart';
 import '../../../../config/di/di.dart';
-import '../../../../core/network/app_api.dart';
 import '../../../login/domain/di/di.dart';
 import '../../../splash/domain/di.dart';
-import '../../data/data_source/register_remote_data_source.dart';
-import '../../data/repo/register_repository.dart';
-import '../usecase/register_usecase.dart';
+import '../../data/data_source/add_patient_remote_data_source.dart';
+import '../../data/repo/add_patient_repository.dart';
+import '../usecase/add_patient_usecase.dart';
 
-initRegisterRequest() async {
-  if (!GetIt.I.isRegistered<RegisterRemoteDataSource>()) {
-    instance.registerLazySingleton<RegisterRemoteDataSource>(
-        () => RegisterRemoteDataSourceImplementation(instance<AppService>()));
+initAddPatientRequest() {
+  if (!GetIt.I.isRegistered<AddPatientRemoteDataSource>()) {
+    instance.registerLazySingleton<AddPatientRemoteDataSource>(
+            () => AddPatientRemoteDataSourceImpl(instance<SupabaseClient>()));
   }
 
-  if (!GetIt.I.isRegistered<RegisterRepository>()) {
-    instance.registerLazySingleton<RegisterRepository>(
-        () => RegisterRepositoryImplement(instance(), instance()));
+  if (!GetIt.I.isRegistered<AddPatientRepository>()) {
+    instance.registerLazySingleton<AddPatientRepository>(
+            () => AddPatientRepositoryImpl(instance()));
   }
 
-  if (!GetIt.I.isRegistered<RegisterUseCase>()) {
-    instance.registerFactory<RegisterUseCase>(
-        () => RegisterUseCase(instance<RegisterRepository>()));
-  }
-}
-
-disposeRegisterRequest() {
-  if (GetIt.I.isRegistered<RegisterRemoteDataSource>()) {
-    instance.unregister<RegisterRemoteDataSource>();
-  }
-
-  if (GetIt.I.isRegistered<RegisterRepository>()) {
-    instance.unregister<RegisterRepository>();
-  }
-
-  if (GetIt.I.isRegistered<RegisterUseCase>()) {
-    instance.unregister<RegisterUseCase>();
+  if (!GetIt.I.isRegistered<AddPatientUseCase>()) {
+    instance.registerFactory<AddPatientUseCase>(
+            () => AddPatientUseCase(instance<AddPatientRepository>()));
   }
 }
 
+disposeAddPatientRequest() {
+  if (GetIt.I.isRegistered<AddPatientRemoteDataSource>()) {
+    instance.unregister<AddPatientRemoteDataSource>();
+  }
+
+  if (GetIt.I.isRegistered<AddPatientRepository>()) {
+    instance.unregister<AddPatientRepository>();
+  }
+
+  if (GetIt.I.isRegistered<AddPatientUseCase>()) {
+    instance.unregister<AddPatientUseCase>();
+  }
+}
 initRegister() {
-  initRegisterRequest();
   disposeLogin();
   disposeSplash();
   disposeLogin();
@@ -51,7 +50,7 @@ initRegister() {
 }
 
 disposeRegister() {
-  disposeRegisterRequest();
+  disposeAddPatientRequest();
   if (Get.isRegistered<RegisterController>()) {
     Get.delete<RegisterController>();
   }

@@ -4,7 +4,6 @@ import '../../config/constants/env_constants.dart';
 import '../../config/constants/request_constants.dart';
 import '../../config/constants/request_endpoint_constants.dart';
 import '../../features/login/data/response/login_response.dart';
-import '../../features/register/data/response/register_response.dart';
 import '../service/env_service.dart';
 
 part 'app_api.g.dart';
@@ -26,12 +25,6 @@ abstract class AppService {
     @Field(RequestConstants.password) String password,
   );
 
-  @POST(RequestConstantsEndpoints.register)
-  Future<RegisterResponse> register(
-    @Field(RequestConstants.email) String phoneNumber,
-    @Field(RequestConstants.name) String name,
-    @Field(RequestConstants.password) String password,
-  );
 
   // @GET(RequestConstantsEndpoints.home)
   // Future<HomeResponse> home();

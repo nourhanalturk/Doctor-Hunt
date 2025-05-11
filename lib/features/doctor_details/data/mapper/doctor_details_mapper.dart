@@ -1,4 +1,4 @@
-import 'package:tender/features/doctor_details/data/mapper/sub_home_data+mapper.dart';
+import 'package:tender/features/doctor_details/data/mapper/sub_home_data_mapper.dart';
 
 import '../../domain/model/doctor_details_model.dart';
 import '../response/doctor_details_response.dart';

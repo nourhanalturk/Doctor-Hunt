@@ -6,6 +6,7 @@ import 'package:tender/features/chat/presentation/view/chat_view.dart';
 import 'package:tender/features/home/domain/di/di.dart';
 import 'package:tender/features/home/presentation/view/home_view.dart';
 
+import '../../../favorites/domain/di/di.dart';
 import '../../../favorites/presentation/view/favorites_view.dart';
 
 class MainHomeController extends GetxController {
@@ -39,15 +40,16 @@ class MainHomeController extends GetxController {
 
   changeBottomNavIndex(int index) {
     currentBottomNavIndex = index;
+    initDI();
     update();
   }
 
-  init() {
+  initDI() {
     switch (currentBottomNavIndex) {
       case 0:
         initHome();
       case 1:
-        initHome();
+        initFavorites();
       case 2:
         initHome();
       case 3:
@@ -64,7 +66,7 @@ class MainHomeController extends GetxController {
 
   @override
   void onInit() {
-    init();
+    initDI();
     super.onInit();
   }
 }

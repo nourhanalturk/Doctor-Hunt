@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:tender/config/constants/constants.dart';
 import 'package:tender/core/enums/doctor_card_enum.dart';
 import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_colors.dart';
@@ -182,6 +185,30 @@ class DoctorDetailsView extends StatelessWidget {
                       ManagerRadius.r12,
                     ),
                   ),
+
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlutterMap(
+                      options: MapOptions(
+                        initialCenter: controller.coordinates,
+                        initialZoom: 13.0,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: Constants.flutterMapUrl,
+                        ),
+                         MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: controller.coordinates,
+                              child: const Icon(Icons.location_on, color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                  ,
                 )
               ],
             ),

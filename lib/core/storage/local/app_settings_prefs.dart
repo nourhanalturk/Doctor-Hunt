@@ -67,4 +67,11 @@ class AppSettingsPrefs {
         )
         .onNull();
   }
+  Future<void> setPatientUid(String uid) async {
+    await _sharedPreferences.setString(SharedPrefsConstants.patientUid, uid);
+  }
+
+  String getPatientUid() {
+    return _sharedPreferences.getString(SharedPrefsConstants.patientUid).onNull();
+  }
 }

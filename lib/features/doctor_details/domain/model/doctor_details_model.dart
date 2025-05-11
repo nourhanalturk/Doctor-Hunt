@@ -7,7 +7,7 @@ class DoctorDetailsModel {
   final int? runningPatients;
   final int? outgoingPatients;
   final int? patients;
-  final String? location;
+  final String location;
   final double? coastPerHour;
   final List<String>? services;
   final SubHomeDataModel? homeData;
@@ -15,11 +15,11 @@ class DoctorDetailsModel {
   DoctorDetailsModel({
     required this.id,
     required this.createdAt,
+    required this.location,
     this.doctorId,
     this.runningPatients,
     this.outgoingPatients,
     this.patients,
-    this.location,
     this.coastPerHour,
     this.homeData,
     this.services,
@@ -28,10 +28,10 @@ class DoctorDetailsModel {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is DoctorDetailsModel &&
-              runtimeType == other.runtimeType &&
-              id == other.id &&
-              createdAt == other.createdAt;
+      other is DoctorDetailsModel &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          createdAt == other.createdAt;
 
   @override
   int get hashCode => id.hashCode ^ createdAt.hashCode;
