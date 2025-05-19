@@ -24,7 +24,7 @@ Widget successAppointmentDialog({
         borderRadius: BorderRadius.circular(14),
       ),
       backgroundColor: ManagerColors.white,
-      child: Container(
+      child: SizedBox(
         height: size.height * ManagerOpacity.op0_8,
         width: size.width * 1.0,
         child: Padding(

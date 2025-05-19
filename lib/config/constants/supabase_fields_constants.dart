@@ -6,8 +6,14 @@ class SupabaseFieldsConstants {
   static const String patientId = 'patient_id';
   static const String contactNumber = 'contact_number';
   static const String dependentName = 'dependent_name';
+  static const String dependentImageUrl = 'dependent_image_url';
 
   static const String createdAt = 'created_at';
   static const String updatedAt = 'updated_at';
   static const String uuid = 'uuid';
+
+  static const String appointmentTime = 'appointment_time';
+  static const String status = 'status';
+
+  static const userId = 'user_id';
 }

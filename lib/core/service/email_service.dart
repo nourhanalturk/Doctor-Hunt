@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tender/core/network/dio_factory.dart';
 import 'package:tender/core/resources/manager_colors.dart';
-import 'package:tender/core/resources/manager_opacity.dart';
-
 import '../resources/manager_strings.dart';
 
 class EmailService {

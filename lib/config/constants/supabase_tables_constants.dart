@@ -2,4 +2,8 @@ class SupabaseTableConstants {
   static const String availableTimes = 'available_times';
   static const String patients = 'patients';
   static const String appointments = 'appointments';
+  static const String doctorDetails = 'doctor_details';
+  static const String homeData = 'home_data';
+  static const favorites = 'favorites';
+
 }

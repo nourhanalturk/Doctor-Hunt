@@ -6,7 +6,6 @@ import '../enums/doctor_card_enum.dart';
 import '../resources/manager_colors.dart';
 import '../resources/manager_font_size.dart';
 import '../resources/manager_height.dart';
-import '../resources/manager_icons.dart';
 import '../resources/manager_opacity.dart';
 import '../resources/manager_strings.dart';
 import '../resources/manager_styles.dart';

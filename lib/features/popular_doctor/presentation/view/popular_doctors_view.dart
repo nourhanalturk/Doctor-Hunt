@@ -99,10 +99,11 @@ class PopularDoctorsView extends StatelessWidget {
                         doctorRate: 3,
                         isDebug: true,
                         image: ManagerImages.defaultDoctorImage,
-                        doctorName: ManagerStrings.name,
+                        doctorName: ManagerStrings.yourName,
                         doctorSpeciality: ManagerStrings.messageViaWhatsapp,
                         onFavoritesPressed: () {},
                         cardEnum: DoctorCardEnum.popularDoctorCard,
+                        doctorId: 2,
                       ),
                       SizedBox(
                         height: size.height * ManagerOpacity.op0_01,

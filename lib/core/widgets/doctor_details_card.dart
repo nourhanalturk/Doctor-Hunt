@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tender/config/di/di.dart';
 import 'package:tender/core/extensions/extensions.dart';
+import 'package:tender/core/storage/local/app_settings_prefs.dart';
+import 'package:tender/features/favorites/presentation/controller/favorites_controller.dart';
 import '../enums/doctor_card_enum.dart';
 import '../resources/manager_colors.dart';
 import '../resources/manager_font_size.dart';
@@ -19,6 +23,7 @@ Widget mainDoctorCard({
   required String doctorName,
   required String doctorSpeciality,
   required void Function()? onFavoritesPressed,
+  required int doctorId,
   double? imageHeight,
   String? costPerHour,
   required DoctorCardEnum cardEnum,
@@ -57,13 +62,17 @@ Widget mainDoctorCard({
                 borderRadius: BorderRadius.circular(
                   ManagerRadius.r12,
                 ),
-                child: isDebug?? false ?  Image.asset(
-                  image,
-                  height: imageHeight ?? size.height * ManagerOpacity.op0_13,
-                ): Image.network(
-                  image,
-                  height: imageHeight ?? size.height * ManagerOpacity.op0_13,
-                ),
+                child: isDebug ?? false
+                    ? Image.asset(
+                        image,
+                        height:
+                            imageHeight ?? size.height * ManagerOpacity.op0_13,
+                      )
+                    : Image.network(
+                        image,
+                        height:
+                            imageHeight ?? size.height * ManagerOpacity.op0_13,
+                      ),
               ),
               SizedBox(
                 width: ManagerWidth.w15,
@@ -83,13 +92,34 @@ Widget mainDoctorCard({
                       SizedBox(
                         width: size.width * ManagerOpacity.op0_03,
                       ),
-                      IconButton(
-                        onPressed: onFavoritesPressed,
-                        icon: Icon(
-                          ManagerIcons.favorite,
-                          color: ManagerColors.blueBell,
-                        ),
-                      ),
+                      GetBuilder<FavoritesController>(
+                        builder: (controller) {
+                          bool isFav = controller.isFavorite(doctorId);
+
+                          return IconButton(
+                            onPressed: () async {
+                              final user =
+                                  Supabase.instance.client.auth.currentUser;
+
+                              if (user == null) {
+                                print('User not authenticated!');
+                                Get.snackbar('Error', 'Please login first');
+                                return;
+                              }
+
+                              controller.toggleFavorite(user.id, doctorId);
+                            },
+                            icon: Icon(
+                              isFav
+                                  ? ManagerIcons.favoriteFilled
+                                  : ManagerIcons.favorite,
+                              color: isFav
+                                  ? ManagerColors.redColor
+                                  : ManagerColors.blueBell,
+                            ),
+                          );
+                        },
+                      )
                     ],
                   ),
                   buildDoctorInfo(

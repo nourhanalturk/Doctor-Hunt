@@ -13,6 +13,20 @@ class ManagerStrings {
   static const String refreshFailed = "refreshing failed";
   static const String tokenExpired = "access token is expired";
 
+  static String get unexpectedError => tr('unexpectedError');
+
+  static String get youHaveToSelectATime => tr('youHaveToSelectATime');
+
+  static String get networkError => tr('networkError');
+
+  static String get profile => tr('profile');
+
+  static String get setUpYourProfile => tr('setUpYourProfile');
+
+  static String get updateYourProfile => tr('updateYourProfile');
+
+  static String get dateOfBirth => tr('dateOfBirth');
+
   static String get question => tr('question');
 
   static String get noContent => tr('noContent');
@@ -166,7 +180,7 @@ class ManagerStrings {
 
   static String get haveAnAccount => tr('haveAnAccount');
 
-  static String get name => tr('name');
+  static String get yourName => tr('yourName');
 
   static String get keepGoing => tr('continue');
 
@@ -289,4 +303,44 @@ class ManagerStrings {
   static String get reminderMeBefore => tr('reminderMeBefore');
 
   static String get minit => tr('minit');
+
+  static String get personalInformation => tr('personalInformation');
+
+  static String get name => tr('name');
+
+  static String get location => tr('location');
+
+  static String get addAMedicalRecord => tr('addAMedicalRecord');
+
+  static String get aDetailedHealthHistory => tr('aDetailedHealthHistory');
+
+  static String get addARecord => tr('addARecord');
+
+  static String get medicalRecords => tr('medicalRecords');
+
+  static String get takeAPhoto => tr('takeAPhoto');
+
+  static String get uploadFromGallery => tr('uploadFromGallery');
+
+  static String get uploadFiles => tr('uploadFiles');
+
+  static String get addMoreImages => tr('addMoreImages');
+
+  static String get recordFor => tr('recordFor');
+
+  static String get typeOfRecord => tr('typeOfRecord');
+
+  static String get report => tr('report');
+
+  static String get prescription => tr('prescription');
+
+  static String get invoice => tr('invoice');
+
+  static String get favoriteDoctors => tr('favoriteDoctors');
+
+  static String get chats => tr('chats');
+
+  static String get chatWith => tr('chatWith');
+
+
 }

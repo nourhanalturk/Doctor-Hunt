@@ -18,6 +18,19 @@ class ManagerImages {
   static const String defaultDoctorImage = '$imagesPath/image.png';
   static const String like = '$imagesPath/like.svg';
 
+  static const String helpCenter = '$imagesPath/help-center.svg';
+  static const String medicalOrders = '$imagesPath/medical-orders.svg';
+  static const String medicalRecords = '$imagesPath/medical-record.svg';
+  static const String paymentsIcon = '$imagesPath/payments-icon.svg';
+  static const String privacyPolicy = '$imagesPath/privacy-policy.svg';
+  static const String setting = '$imagesPath/setting.svg';
+  static const String testBooking = '$imagesPath/test-booking.svg';
+  static const String logout = '$imagesPath/logout.svg';
+  static const String emptyMedicalRecords = '$imagesPath/empty-medical-records.svg';
+  static const String camera = '$imagesPath/camera.svg';
+  static const String imageIcon = '$imagesPath/image.svg';
+  static const String pdfIcon = '$imagesPath/pdf-icon.svg';
+
 
 
 }

@@ -22,7 +22,9 @@ Widget textField({
   TextStyle? style,
   String? hintText,
   FocusNode? focusNode,
-  Color? hintColor
+  Color? hintColor,
+  Widget? label,
+  void Function(String)? onFieldSubmitted
 }) {
   return TextFormField(
     controller: controller,
@@ -36,6 +38,7 @@ Widget textField({
       fontSize: ManagerFontSize.s18,
       color: ManagerColors.blueBell,
     ),
+    onFieldSubmitted: onFieldSubmitted,
     decoration: decoration ??
         InputDecoration(
           border: OutlineInputBorder(
@@ -53,6 +56,7 @@ Widget textField({
                 color:hintColor?? ManagerColors.grayColor,
               ),
           hintText: hintText ,
+          label: label?? null,
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(
               ManagerRadius.r12,

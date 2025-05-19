@@ -69,6 +69,7 @@ class RegisterController extends GetxController {
       (value) async {
         AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
         prefs.setUserLoggedIn();
+        prefs.setPatientName(nameController.text);
         CacheData.setEmail(value: emailController.text);
         CacheData.setUserName(name: nameController.text);
         isLoading = 0;

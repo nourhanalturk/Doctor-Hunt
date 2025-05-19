@@ -96,5 +96,5 @@ Widget contentCard({
       ),
     ),
   );
-  ;
+
 }

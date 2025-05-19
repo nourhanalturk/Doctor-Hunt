@@ -12,13 +12,17 @@ import '../resources/manager_strings.dart';
 import '../resources/manager_styles.dart';
 import '../resources/manager_width.dart';
 
-Widget doctorInfoCard({
-  required void Function()? onFavoritePressed,
-  required String? doctorRate,
-  required String? doctorName,
-  required String? coastByHour,
-  required String? image,
-}) {
+Widget doctorInfoCard(
+    {required void Function()? onFavoritePressed,
+    required String? doctorRate,
+    required String? doctorName,
+    required String? coastByHour,
+    required String? image,
+    String? doctorSpeciality,
+    double? cardHeight,
+    double? cardWidth,
+    bool? isFavInfoShown,
+    double? imageRadius}) {
   var size = MediaQuery.of(Get.context!).size;
 
   return Padding(
@@ -28,8 +32,8 @@ Widget doctorInfoCard({
     child: Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        height: size.height * ManagerOpacity.op0_2,
-        width: size.width * ManagerOpacity.op0_33,
+        height: cardHeight ?? size.height * ManagerOpacity.op0_2,
+        width: cardWidth ?? size.width * ManagerOpacity.op0_33,
         decoration: BoxDecoration(
           color: ManagerColors.white,
           borderRadius: BorderRadius.circular(
@@ -48,7 +52,8 @@ Widget doctorInfoCard({
                   IconButton(
                     onPressed: onFavoritePressed,
                     icon: Icon(
-                      ManagerIcons.favorite,
+                      ManagerIcons.favoriteFilled,
+                      color: ManagerColors.redColor,
                     ),
                   ),
                   const Spacer(),
@@ -68,7 +73,7 @@ Widget doctorInfoCard({
             ),
             Center(
               child: CircleAvatar(
-                radius: ManagerRadius.r30,
+                radius: imageRadius ?? ManagerRadius.r30,
                 backgroundImage: NetworkImage(image.onNull()),
               ),
             ),
@@ -80,31 +85,44 @@ Widget doctorInfoCard({
                     fontWeight: ManagerFontWeight.bold,
                   )),
             ),
+            if (isFavInfoShown ?? false)
+              Center(
+                child: Text(
+                  doctorSpeciality.onNull(),
+                  style: TextStyle(
+                    fontSize: ManagerFontSize.s15,
+                    color: ManagerColors.primaryColor,
+                    fontWeight: ManagerFontWeight.medium,
+                  ),
+                ),
+              ),
             SizedBox(
               height: ManagerHeight.h1,
             ),
-            Center(
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: ManagerStrings.dollarSign,
-                      style: TextStyle(
-                        color: ManagerColors.primaryColor,
-                        fontSize: ManagerFontSize.s12,
+            isFavInfoShown ?? false
+                ? SizedBox()
+                : Center(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: ManagerStrings.dollarSign,
+                            style: TextStyle(
+                              color: ManagerColors.primaryColor,
+                              fontSize: ManagerFontSize.s12,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '$coastByHour ${ManagerStrings.byHour}',
+                            style: TextStyle(
+                              color: ManagerColors.blueBell,
+                              fontSize: ManagerFontSize.s12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    TextSpan(
-                      text: '$coastByHour ${ManagerStrings.byHour}',
-                      style: TextStyle(
-                        color: ManagerColors.blueBell,
-                        fontSize: ManagerFontSize.s12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
           ],
         ),
       ),

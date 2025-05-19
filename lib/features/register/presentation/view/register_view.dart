@@ -26,7 +26,7 @@ class RegisterView extends StatelessWidget {
             emailController: controller.emailController,
             passwordController: controller.passwordController,
             nameTextField: textField(
-              hintText: ManagerStrings.name,
+              hintText: ManagerStrings.yourName,
               controller: controller.nameController,
               validator: (value) =>
                   controller.validator.validateFullName(value!),

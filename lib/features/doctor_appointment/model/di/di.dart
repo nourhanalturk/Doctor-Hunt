@@ -16,7 +16,7 @@ initAddAppointmentRequest() {
 
   if (!GetIt.I.isRegistered<AddAppointmentRepository>()) {
     instance.registerLazySingleton<AddAppointmentRepository>(
-        () => AddAppointmentRepositoryImpl(instance()));
+        () => AddAppointmentRepositoryImpl(instance(),instance()));
   }
 
   if (!GetIt.I.isRegistered<AddAppointmentUseCase>()) {

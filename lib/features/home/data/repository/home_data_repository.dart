@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tender/core/internet_checker/interent_checker.dart';
+import 'package:tender/core/internet_checker/internet_checker.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/features/home/data/mapper/home_data_mapper.dart';
 
 import '../../../../config/constants/response_constants.dart';
 import '../../../../core/error_handler/failure.dart';
-import '../../../../core/error_handler/server_faiure.dart';
+import '../../../../core/error_handler/server_failure.dart';
 import '../../domain/model/home_data_model.dart';
 import '../data_source/home_data_remote_data_source.dart';
 
@@ -30,7 +30,8 @@ class HomeRepositoryImpl implements HomeRepository {
       } on PostgrestException catch (e) {
         return Left(ServerFailure(e.message));
       } catch (e) {
-        return Left(ServerFailure('Unexpected error: ${e.toString()}'));
+        return Left(
+            ServerFailure('${ManagerStrings.unexpectedError} ${e.toString()}'));
       }
     } else {
       return Left(
@@ -41,5 +42,4 @@ class HomeRepositoryImpl implements HomeRepository {
       );
     }
   }
-
 }

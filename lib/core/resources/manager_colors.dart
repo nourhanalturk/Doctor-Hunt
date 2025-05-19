@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// A class defined for app colors
 class ManagerColors {
@@ -8,6 +7,7 @@ class ManagerColors {
   static const Color transparent = Colors.transparent;
 
   static const Color primaryColor = Color(0xFF0EBE7F);
+  static const Color scaffoldColor = Color(0xFFE5E5E5);
   static const secondaryColor = Color(0xFF8B94BC);
   static const greenColor = Color(0xFF6AC259);
   static const redColor = Color(0xFFE92E30);

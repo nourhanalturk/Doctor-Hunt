@@ -1,3 +1,5 @@
+import '../../../../config/constants/supabase_fields_constants.dart';
+
 class AddAppointmentRequest {
   final int doctorId;
   final String patientId;
@@ -19,13 +21,13 @@ class AddAppointmentRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'doctor_id': doctorId,
-      'patient_id': patientId,
-      'appointment_time': appointmentTime.toIso8601String(),
-      'status': status,
-      'dependent_name': dependentName,
-      'contact_number': contactNumber,
-      'dependent_image_url': dependentImageUrl,
+      SupabaseFieldsConstants.doctorId: doctorId,
+      SupabaseFieldsConstants.patientId: patientId,
+      SupabaseFieldsConstants.appointmentTime: appointmentTime.toIso8601String(),
+      SupabaseFieldsConstants.status: status,
+      SupabaseFieldsConstants.dependentName: dependentName,
+      SupabaseFieldsConstants.contactNumber: contactNumber,
+      SupabaseFieldsConstants.dependentImageUrl: dependentImageUrl,
     };
   }
 }

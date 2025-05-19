@@ -5,6 +5,7 @@ import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
+import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/doctor_details/data/request/doctor_details_request.dart';
 import 'package:tender/features/doctor_details/domain/model/sub_home_data_model.dart';
 import '../../domain/model/doctor_details_model.dart';
@@ -26,7 +27,7 @@ class DoctorDetailsController extends GetxController {
   List<String> services = [];
 
   bool isLoading = false;
-  LatLng coordinates = LatLng(31.9539, 35.9106);
+  LatLng coordinates = const LatLng(31.9539, 35.9106);
 
   convertLocationString(String location) {
     List<String> parts = location.split(',');
@@ -85,6 +86,40 @@ class DoctorDetailsController extends GetxController {
 
   navigateToAppointment() {
     Get.toNamed(Routes.doctorAppointment);
+  }
+
+  createOrOpenChat() async {
+    AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
+    String patientUid = prefs.getPatientUid();
+
+    final existingResponse = await supabase
+        .from('all_chats')
+        .select()
+        .eq('doctor_id', doctorId)
+        .eq('patient_id', patientUid)
+        .maybeSingle();
+
+    if (existingResponse != null) {
+      final chatUid =await existingResponse['chat_id'];
+      CacheData.setChatUid(chatUid);
+      Get.toNamed(Routes.messages);
+      return;
+    }
+
+    final newChatResponse =await supabase
+        .from('all_chats')
+        .insert({
+          'doctor_id': doctorId,
+          'patient_id': patientUid,
+          'last_message': null,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .select()
+        .single();
+    final chatUid =await newChatResponse['chat_id'];
+    CacheData.setChatUid(chatUid);
+    Get.toNamed(Routes.messages);
+
   }
 
   @override

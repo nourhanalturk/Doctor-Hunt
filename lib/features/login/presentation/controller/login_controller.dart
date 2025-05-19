@@ -1,6 +1,4 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
@@ -12,9 +10,7 @@ import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/core/validator/validator.dart';
 import 'package:tender/features/login/data/request/login_request.dart';
 import 'package:tender/features/login/domain/usecase/login_usecase.dart';
-
 import '../../../../config/constants/constants.dart';
-import '../../../../config/constants/env_constants.dart';
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/service/email_service.dart';
 

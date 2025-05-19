@@ -1,42 +1,47 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/core/resources/manager_images.dart';
-import 'package:tender/features/chat/presentation/view/chat_view.dart';
+import 'package:tender/core/routes/routes.dart';
+import 'package:tender/features/chat/domain/di/di.dart';
+import 'package:tender/features/chat/presentation/view/chats_view.dart';
 import 'package:tender/features/home/domain/di/di.dart';
 import 'package:tender/features/home/presentation/view/home_view.dart';
-
+import '../../../../core/resources/manager_colors.dart';
 import '../../../favorites/domain/di/di.dart';
 import '../../../favorites/presentation/view/favorites_view.dart';
 
 class MainHomeController extends GetxController {
   int currentBottomNavIndex = 0;
-  List<BottomNavigationBarItem> items = [
-    BottomNavigationBarItem(
-      icon: SvgPicture.asset(
-        ManagerImages.home,
-      ),
+
+  List<BottomNavigationBarItem> get items => [
+        buildBottomNavItem(icon: ManagerImages.home, index: 0),
+        buildBottomNavItem(icon: ManagerImages.favorite, index: 1),
+        buildBottomNavItem(icon: ManagerImages.details, index: 2),
+        buildBottomNavItem(icon: ManagerImages.chatting, index: 3),
+      ];
+
+  buildBottomNavItem({required String icon, required int index}) {
+    final bool isSelected = index == currentBottomNavIndex;
+
+    return BottomNavigationBarItem(
       label: '',
-    ),
-    BottomNavigationBarItem(
-      icon: SvgPicture.asset(
-        ManagerImages.favorite,
+      icon: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? ManagerColors.primaryColor
+              : ManagerColors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: SvgPicture.asset(
+          icon,
+          color: isSelected ? ManagerColors.white : ManagerColors.grey,
+        ),
       ),
-      label: '',
-    ),
-    BottomNavigationBarItem(
-      icon: SvgPicture.asset(
-        ManagerImages.details,
-      ),
-      label: '',
-    ),
-    BottomNavigationBarItem(
-      icon: SvgPicture.asset(
-        ManagerImages.chatting,
-      ),
-      label: '',
-    ),
-  ];
+    );
+  }
 
   changeBottomNavIndex(int index) {
     currentBottomNavIndex = index;
@@ -47,13 +52,15 @@ class MainHomeController extends GetxController {
   initDI() {
     switch (currentBottomNavIndex) {
       case 0:
-        initHome();
+        {
+          initHome();
+        }
       case 1:
         initFavorites();
       case 2:
         initHome();
       case 3:
-        initHome();
+        initChats();
     }
   }
 
@@ -61,11 +68,29 @@ class MainHomeController extends GetxController {
     const HomeView(),
     const FavoritesView(),
     const HomeView(),
-    const ChatView(),
+    const ChatsView(),
   ];
+
+  void listenToAuthChanges() {
+    final supabase = Supabase.instance.client;
+
+    supabase.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      final session = data.session;
+
+      print('Auth event: $event');
+      print('User id: ${session?.user?.id}');
+
+      if (session == null) {
+        Get.toNamed(Routes.login);
+      }
+    });
+  }
+
 
   @override
   void onInit() {
+    listenToAuthChanges();
     initDI();
     super.onInit();
   }

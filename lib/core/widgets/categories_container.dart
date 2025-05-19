@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:tender/core/resources/manager_icon_size.dart';
 import 'package:tender/core/resources/manager_opacity.dart';
-import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/resources/manager_radius.dart';
 
 Widget categoriesContainer({

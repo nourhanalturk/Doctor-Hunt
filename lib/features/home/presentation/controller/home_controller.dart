@@ -12,16 +12,14 @@ import 'package:tender/core/routes/routes.dart';
 import 'package:tender/features/home/domain/usecase/home_usecase.dart';
 import '../../../../core/enums/section_enum.dart';
 import '../../../../core/error_handler/failure.dart';
-import '../../../../core/error_handler/server_faiure.dart';
+import '../../../../core/error_handler/server_failure.dart';
 import '../../domain/model/categories_model.dart';
 import '../../domain/model/home_data_model.dart';
 
 class HomeController extends GetxController {
   TextEditingController searchController = TextEditingController();
 
-  // List<LiveDoctorDataModel> liveDoctors = [];
-  // List<PopularDoctorDataModel> popularDoctors = [];
-  // List<FeaturedDoctorDataModel> featureDoctors = [];
+
 
   onSearchButtonClearPressed() {
     searchController.text = '';
@@ -108,11 +106,11 @@ class HomeController extends GetxController {
 
   String _mapFailureToMessage(Failure failure) {
     if (failure is ServerFailure) {
-      return 'Server error: ${failure.message}';
+      return '${ManagerStrings.serverError}: ${failure.message}';
     } else if (failure is NetworkAssetBundle) {
-      return 'Network error: ${failure.message}';
+      return '${ManagerStrings.networkError}: ${failure.message}';
     } else {
-      return 'Unexpected error: ${failure.message}';
+      return '${ManagerStrings.unexpectedError}: ${failure.message}';
     }
   }
 
@@ -120,6 +118,7 @@ class HomeController extends GetxController {
     CacheData.setDoctorDetailsId(value: id);
     Get.toNamed(Routes.doctorDetails);
   }
+
 
   @override
   void onInit() {

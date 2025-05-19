@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tender/core/resources/manager_colors.dart';
 
 import '../resources/manager_height.dart';
 import '../resources/manager_opacity.dart';
@@ -22,6 +23,7 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ManagerColors.scaffoldColor,
       appBar: appBar,
       floatingActionButton: floatingActionButton,
       body: Stack(

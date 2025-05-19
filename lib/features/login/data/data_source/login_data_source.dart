@@ -13,7 +13,7 @@ abstract class LoginRemoteDataSource {
 }
 
 class LoginRemoteDataSourceImplement implements LoginRemoteDataSource {
-  AppService _appService;
+  final AppService _appService;
 
   LoginRemoteDataSourceImplement(this._appService);
 

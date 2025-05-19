@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/core/error_handler/failure.dart';
-import 'package:tender/core/error_handler/server_faiure.dart';
+import 'package:tender/core/error_handler/server_failure.dart';
 import 'package:tender/features/register/data/mapper/add_patient_mapper.dart';
 import 'package:tender/features/register/data/request/add_patient_request.dart';
 

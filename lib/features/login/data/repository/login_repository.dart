@@ -3,7 +3,7 @@ import 'package:tender/features/login/data/mapper/login_mapper.dart';
 import '../../../../core/error_handler/error_handler.dart';
 import '../../../../core/error_handler/failure.dart';
 import '../../../../core/error_handler/response_code.dart';
-import '../../../../core/internet_checker/interent_checker.dart';
+import '../../../../core/internet_checker/internet_checker.dart';
 import '../../../../core/resources/manager_strings.dart';
 import 'package:dartz/dartz.dart';
 import '../../domain/model/login_model.dart';
@@ -18,7 +18,7 @@ abstract class LoginRepository {
 
 class LoginRepositoryImplement implements LoginRepository {
   LoginRemoteDataSource remoteDataSource;
-  NetworkInfo _networkInfo;
+  final NetworkInfo _networkInfo;
 
   LoginRepositoryImplement(this._networkInfo, this.remoteDataSource);
 

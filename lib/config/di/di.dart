@@ -6,7 +6,8 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
-import '../../core/internet_checker/interent_checker.dart';
+import 'package:tender/features/favorites/domain/di/di.dart';
+import '../../core/internet_checker/internet_checker.dart';
 import '../../core/network/app_api.dart';
 import '../../core/network/dio_factory.dart';
 import '../constants/constants.dart';
@@ -23,8 +24,12 @@ initModule() async {
     url: Constants.supaBaseUrl,
     anonKey: Constants.supaAnonKey,
     debug: true,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+
+    ),
   );
-  // Register Supabase Client
+
   if (!GetIt.I.isRegistered<SupabaseClient>()) {
     instance.registerLazySingleton<SupabaseClient>(
           () => Supabase.instance.client,
@@ -66,5 +71,7 @@ initModule() async {
   if (!GetIt.I.isRegistered<AppService>()) {
     instance.registerLazySingleton<AppService>(() => AppService(dio));
   }
+
+  initFavorites();
 
 }

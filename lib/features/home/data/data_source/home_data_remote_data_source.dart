@@ -1,4 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tender/config/constants/supabase_fields_constants.dart';
+import 'package:tender/config/constants/supabase_tables_constants.dart';
 import 'package:tender/config/di/di.dart';
 
 import '../response/home_data_response.dart';
@@ -8,13 +10,12 @@ abstract class HomeRemoteDataSource {
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
-  final SupabaseClient _client;
-
-  HomeRemoteDataSourceImpl(this._client);
+  HomeRemoteDataSourceImpl();
 
   @override
   Future<List<HomeResponse>> getHomeSections() async {
-    final response = await supabase.from('home_data').select('''
+    final response =
+        await supabase.from(SupabaseTableConstants.homeData).select('''
         id,
         created_at,
         section,
@@ -24,7 +25,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
         specialty,
         rating,
         coast_per_hour
-    ''').order('created_at', ascending: false);
+    ''').order(SupabaseFieldsConstants.createdAt, ascending: false);
 
     return response.map((json) => HomeResponse.fromJson(json)).toList();
   }

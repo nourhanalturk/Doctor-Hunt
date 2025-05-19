@@ -6,7 +6,6 @@ import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_font_size.dart';
 import 'package:tender/core/resources/manager_height.dart';
 import 'package:tender/core/resources/manager_icons.dart';
-import 'package:tender/core/resources/manager_images.dart';
 import 'package:tender/core/resources/manager_opacity.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/resources/manager_styles.dart';
@@ -19,6 +18,7 @@ import 'package:tender/features/home/presentation/controller/home_controller.dar
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/resources/manager_radius.dart';
 import '../../domain/model/categories_model.dart';
+
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -188,7 +188,7 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: size.height * ManagerOpacity.op0_03,
+                height: size.height * ManagerOpacity.op0_02,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(

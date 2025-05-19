@@ -1,4 +1,7 @@
 class DoctorDetailsRequest {
   int doctorId;
-  DoctorDetailsRequest({required this.doctorId,});
+
+  DoctorDetailsRequest({
+    required this.doctorId,
+  });
 }

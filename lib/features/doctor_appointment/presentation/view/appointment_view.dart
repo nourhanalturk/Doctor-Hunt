@@ -65,6 +65,7 @@ class DoctorAppointmentView extends StatelessWidget {
                             costPerHour:
                                 controller.doctorCoastPerHour.toString(),
                             doctorRate: controller.doctorRating,
+                            doctorId: controller.doctorId,
                           ),
                           SizedBox(
                             height: size.height * ManagerOpacity.op0_05,

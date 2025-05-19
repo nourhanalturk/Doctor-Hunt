@@ -14,7 +14,7 @@ import 'package:tender/features/doctor_appointment/data/request/appointment_requ
 import 'package:tender/features/doctor_appointment/model/di/di.dart';
 import 'package:tender/features/doctor_appointment/model/usecase/appointment_usecase.dart';
 import '../../../../config/constants/constants.dart';
-import '../../../../config/constants/supabase_fiels_constants.dart';
+import '../../../../config/constants/supabase_fields_constants.dart';
 import '../../../../config/constants/supabase_tables_constants.dart';
 import '../view/widget/success_appointment_dialog.dart';
 
@@ -94,7 +94,15 @@ class DoctorAppointmentController extends GetxController {
 
   addAppointment() async {
     await uploadSelectedImage();
-    if (timeSelected == null) return;
+    if (timeSelected == null) {
+      dialogRender(
+        context: Get.context!,
+        stateRenderType: StateRenderType.popUpErrorState,
+        message: ManagerStrings.youHaveToSelectATime,
+        title: '',
+      );
+      return;
+    }
 
     initAddAppointmentRequest();
     AddAppointmentUseCase useCase = instance<AddAppointmentUseCase>();

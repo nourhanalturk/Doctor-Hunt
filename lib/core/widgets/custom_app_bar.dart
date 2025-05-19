@@ -11,9 +11,10 @@ import 'package:tender/core/resources/manager_styles.dart';
 import 'package:tender/core/resources/manager_width.dart';
 
 Widget customAppBar({
-  required void Function()? onSearchButtonPressed,
+  void Function()? onSearchButtonPressed,
   bool? isSearchButtonAppear,
   String? appBarTitle,
+  Color? titleColor
 }) {
   return Row(
     children: [
@@ -48,7 +49,7 @@ Widget customAppBar({
         appBarTitle.onNull(),
         style: getBoldTextStyle(
           fontSize: ManagerFontSize.s22,
-          color: ManagerColors.lightBlack,
+          color:titleColor?? ManagerColors.lightBlack,
         ),
       ),
       const Spacer(),

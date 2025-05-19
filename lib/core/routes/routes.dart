@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/doctor_details/domain/di/di.dart';
 import 'package:tender/features/doctor_details/presentation/view/doctor_details_view.dart';
 import 'package:tender/features/login/domain/di/di.dart';
 import 'package:tender/features/login/presentation/view/login_view.dart';
 import 'package:tender/features/main_home/domain/di/di.dart';
 import 'package:tender/features/main_home/presentation/view/main_home_view.dart';
+import 'package:tender/features/medical_records/domain/di/di.dart';
+import 'package:tender/features/medical_records/presentation/view/add_medical_record_view.dart';
+import 'package:tender/features/medical_records/presentation/view/medical_records_view.dart';
 import 'package:tender/features/out_boarding/presentation/view/out_boarding_view.dart';
 import 'package:tender/features/popular_doctor/presentation/view/popular_doctors_view.dart';
+import 'package:tender/features/profile/domain/di/di.dart';
+import 'package:tender/features/profile/presentation/view/profile_view.dart';
 import 'package:tender/features/register/domain/di/di.dart';
 import 'package:tender/features/register/presentation/view/register_view.dart';
 import 'package:tender/features/splash/domain/di.dart';
 import 'package:tender/features/splash/presentation/view/splash_view.dart';
+import '../../features/chat/presentation/view/chats_view.dart';
 import '../../features/doctor_appointment/model/di/di.dart';
 import '../../features/doctor_appointment/presentation/view/appointment_view.dart';
 import '../../features/home/domain/di/di.dart';
 import '../../features/home/presentation/view/home_view.dart';
+import '../../features/messages/domain/di/di.dart';
+import '../../features/messages/presentation/view/messages_view.dart';
 import '../../features/out_boarding/domain/di.dart';
 import '../../features/popular_doctor/domain/di/di.dart';
 import '../resources/manager_strings.dart';
@@ -30,7 +39,11 @@ class Routes {
   static const String doctorDetails = '/doctorDetails';
   static const String doctorAppointment = '/doctorAppointment';
   static const String popularDoctors = '/popularDoctors';
-
+  static const String profile = '/profile';
+  static const String medicalRecords = '/medicalRecords';
+  static const String addRecord = '/addRecord';
+  static const String chats = '/chats';
+  static const String messages = '/messages';
 }
 
 class RouteGenerator {
@@ -81,6 +94,33 @@ class RouteGenerator {
         return MaterialPageRoute(
           builder: (context) => const PopularDoctorsView(),
         );
+      case Routes.profile:
+        initProfile();
+        return MaterialPageRoute(
+          builder: (context) => const ProfileView(),
+        );
+      case Routes.medicalRecords:
+        initMedicalRecords();
+        return MaterialPageRoute(
+          builder: (context) => const MedicalRecordsView(),
+        );
+      case Routes.addRecord:
+        initMedicalRecords();
+        return MaterialPageRoute(
+          builder: (context) => const AddMedicalRecordView(),
+        );
+      case Routes.chats:
+        initChats();
+        return MaterialPageRoute(
+          builder: (context) => const ChatsView(),
+        );
+      case Routes.messages:
+        initMessages();
+        return MaterialPageRoute(
+          builder: (context) => const MessagesView(),
+        );
+
+
       default:
         return unDefinedRoute();
     }

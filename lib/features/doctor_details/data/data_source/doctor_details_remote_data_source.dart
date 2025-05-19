@@ -1,7 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tender/config/constants/supabase_fields_constants.dart';
+import 'package:tender/config/constants/supabase_tables_constants.dart';
 import 'package:tender/config/di/di.dart';
 
-import '../../../../core/error_handler/server_faiure.dart';
+import '../../../../core/error_handler/server_failure.dart';
 import '../response/doctor_details_response.dart';
 
 abstract class DoctorDetailsRemoteDataSource {
@@ -10,17 +12,16 @@ abstract class DoctorDetailsRemoteDataSource {
 
 class DoctorDetailsRemoteDataSourceImpl
     implements DoctorDetailsRemoteDataSource {
-  final SupabaseClient _client;
 
-  DoctorDetailsRemoteDataSourceImpl(this._client);
+  DoctorDetailsRemoteDataSourceImpl();
 
   @override
   Future<List<DoctorDetailsResponse>> getDoctorDetails(int doctorId) async {
     try {
       final response = await supabase
-          .from('doctor_details')
+          .from(SupabaseTableConstants.doctorDetails)
           .select('*, home_data:home_data_id (name, image, specialty, rating)')
-          .eq('doctor_id', doctorId)
+          .eq(SupabaseFieldsConstants.doctorId, doctorId)
           .single();
 
       return [
