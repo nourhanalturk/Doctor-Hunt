@@ -19,6 +19,7 @@ class ManagerOpacity {
   static double op0_22 = 0.22;
   static double op0_25 = 0.25;
   static double op0_3 = 0.3;
+  static double op0_39 = 0.39;
   static double op0_33 = 0.33;
   static double op0_4 = 0.4;
   static double op0_45 = 0.45;
@@ -28,5 +29,6 @@ class ManagerOpacity {
   static double op0_8 = 0.8;
   static double op0_85 = 0.85;
   static double op0_9 = 0.9;
+  static double op0_94 = 0.94;
   static double op0_10 = 1;
 }

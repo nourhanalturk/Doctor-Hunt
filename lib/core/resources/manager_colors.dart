@@ -36,6 +36,10 @@ class ManagerColors {
   static const Color darkOrange = Color(0xffFF484C);
   static const Color lightOrange = Color(0xffFF6C60);
 
+  static const Color lightBlueGray = Color(0xFFB0C4DE);
+  static const Color midBlueGray = Color(0xFF5A6D89);
+  static const Color darkBlueGray = Color(0xFF2A3B57);
+
 
 
 

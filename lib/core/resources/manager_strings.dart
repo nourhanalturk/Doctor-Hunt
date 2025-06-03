@@ -8,6 +8,7 @@ class ManagerStrings {
   static String get success => tr('success');
 
   static String get skip => tr('skip');
+  static String get live => tr('live');
 
   static const String authException = "AuthException";
   static const String refreshFailed = "refreshing failed";
@@ -342,5 +343,132 @@ class ManagerStrings {
 
   static String get chatWith => tr('chatWith');
 
+  static String get myDoctors => tr('myDoctors');
 
+  static String get payments => tr('payments');
+
+  static String get medicinesOrders => tr('medicinesOrders');
+
+  static String get testBookings => tr('testBookings');
+
+  static String get privacyAndPolicy => tr('privacyAndPolicy');
+
+  static String get helpCenter => tr('helpCenter');
+
+  static String get settings => tr('settings');
+
+  static String get logOut => tr('logOut');
+
+  static String get diseaseName => tr('diseaseName');
+
+  static String get description => tr('description');
+
+  static String get reportDate => tr('reportDate');
+
+  static String get doctorName => tr('doctorName');
+
+  static String get medicineNames => tr('medicineNames');
+
+  static String get pleaseEnterADate => tr('pleaseEnterADate');
+
+  static String get enterDateInDDMMYYYYFormat => tr('medicineNames');
+
+  static String get uploadingImage => tr('uploadingImage');
+
+  static String get failed => tr('failed');
+
+  static String get yourRecordSuccessfullyAdded =>
+      tr('yourRecordSuccessfullyAdded');
+
+  static String get accountSettings => tr('accountSettings');
+
+  static String get changePassword => tr('changePassword');
+
+  static String get notifications => tr('notifications');
+
+  static String get statistics => tr('statistics');
+
+  static String get aboutUs => tr('aboutUs');
+
+  static String get moreOptions => tr('moreOptions');
+
+  static String get textMessages => tr('textMessages');
+
+  static String get phoneCalls => tr('phoneCalls');
+
+  static String get languages => tr('languages');
+
+  static String get english => tr('english');
+
+  static String get currency => tr('currency');
+
+  static String get sUsd => tr('sUsd');
+
+  static String get linkedAccounts => tr('linkedAccounts');
+
+  static String get addAll => tr('addAll');
+
+  static String get en => tr('en');
+
+  static String get ar => tr('ar');
+
+  static String get arabic => tr('arabic');
+
+  static String get healthCheckups => tr('healthCheckups');
+
+  static String get guideToMedicine => tr('guideToMedicine');
+
+  static String get order => tr('order');
+
+  static String get prescriptionRelatedIssues =>
+      tr('prescriptionRelatedIssues');
+
+  static String get orderStatus => tr('orderStatus');
+
+  static String get orderDelivery => tr('orderDelivery');
+
+  static String get paymentsAndRefunds => tr('paymentsAndRefunds');
+
+  static String get orderReturns => tr('orderReturns');
+
+  static String get getFullBodyHealthCheckups =>
+      tr('getFullBodyHealthCheckups');
+
+  static String get upTo45OffAndHealthcareBack =>
+      tr('upTo45OffAndHealthcareBack');
+
+  static String get freeHomeSamplePickup => tr('freeHomeSamplePickup');
+
+  static String get practoAssociateLabs => tr('practoAssociateLabs');
+
+  static String get eReportsIn24To72Hours => tr('eReportsIn24To72Hours');
+
+  static String get freeFollowUpWithDoctor => tr('freeFollowUpWithDoctor');
+
+  static String get recommendForYou => tr('recommendForYou');
+
+  static String get advancedYoungIndianHealthCheckup =>
+      tr('advancedYoungIndianHealthCheckup');
+
+  static String get idealForAged21To40 => tr('idealForAged21To40');
+
+  static String get testsIncluded => tr('testsIncluded');
+
+  static String get originalPrice358 => tr('originalPrice358');
+
+  static String get discountedPrice330With35Off =>
+      tr('discountedPrice330With35Off');
+
+  static String get healthCashbackTnC => tr('healthCashbackTnC');
+
+  static String get appointmentBookedByYou => tr('appointmentBookedByYou');
+  static String get noImageAttached => tr('noImageAttached');
+
+
+  static const String unauthorized = 'You are not authorized to perform this action.';
+  static const String uploadFailed = 'Image upload failed.';
+  static const String payloadTooLarge = 'The file is too large to upload.';
+  static const String bucketNotFound = 'Storage bucket not found.';
+  static const String quotaExceeded = 'Storage quota exceeded.';
+  static const String unknownError = 'An unknown error occurred.';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:tender/core/resources/manager_colors.dart';
 import 'package:tender/core/resources/manager_opacity.dart';
 import '../../../../core/resources/manager_radius.dart';
 
@@ -9,6 +10,8 @@ Widget categoriesContainer({
   required Color? secondColor,
   required String? icon,
   required Function()? onTap,
+  double? height,
+  double? width,
 }) {
   var size = MediaQuery
       .of(Get.context!)
@@ -18,8 +21,8 @@ Widget categoriesContainer({
     child: Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        height: size.height * ManagerOpacity.op0_1,
-        width: size.width * ManagerOpacity.op0_2,
+        height:height?? size.height * ManagerOpacity.op0_1,
+        width:width?? size.width * ManagerOpacity.op0_2,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(
             ManagerRadius.r12,
@@ -61,7 +64,7 @@ Widget categoriesContainer({
               ),
             ),
             Center(
-              child:SvgPicture.asset(icon!),
+              child:SvgPicture.asset(icon!,color: ManagerColors.white,),
             ),
           ],
         ),

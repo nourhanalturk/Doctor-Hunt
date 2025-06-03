@@ -11,6 +11,7 @@ class MessagesController extends GetxController {
   List<MessageModel> messages = [];
 
   fetchMessages() async {
+    chatUid = CacheData.chatUid;
     final currentUid = supabase.auth.currentUser?.id;
 
     final response = await supabase
@@ -23,7 +24,6 @@ class MessagesController extends GetxController {
         .map<MessageModel>((msg) => MessageModel.fromJson(msg, currentUid!))
         .toList();
 
-    print(messages);
     update();
   }
 

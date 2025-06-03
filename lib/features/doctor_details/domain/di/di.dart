@@ -6,16 +6,15 @@ import '../../data/data_source/doctor_details_remote_data_source.dart';
 import '../../data/repository/doctor_details_repository.dart';
 import '../usecase/doctor_details_usecase.dart';
 
-initDoctorDetailsRequest (){
+initDoctorDetailsRequest() {
   if (!GetIt.I.isRegistered<DoctorDetailsRemoteDataSource>()) {
     instance.registerLazySingleton<DoctorDetailsRemoteDataSource>(
-            () => DoctorDetailsRemoteDataSourceImpl());
+        () => DoctorDetailsRemoteDataSourceImpl());
   }
 
   if (!GetIt.I.isRegistered<DoctorDetailsRepository>()) {
     instance.registerLazySingleton<DoctorDetailsRepository>(
-            () => DoctorDetailsRepositoryImpl(instance(),instance()));
-
+        () => DoctorDetailsRepositoryImpl(instance(), instance()));
   }
 
   if (!GetIt.I.isRegistered<DoctorDetailsUseCase>()) {
@@ -23,9 +22,30 @@ initDoctorDetailsRequest (){
   }
 }
 
-initDoctorDetails(){
+disposeDoctorDetailsRequest() {
+  if (GetIt.I.isRegistered<DoctorDetailsRemoteDataSource>()) {
+    instance.unregister<DoctorDetailsRemoteDataSource>();
+  }
+
+  if (GetIt.I.isRegistered<DoctorDetailsRepository>()) {
+    instance.unregister<DoctorDetailsRepository>();
+  }
+
+  if (GetIt.I.isRegistered<DoctorDetailsUseCase>()) {
+    instance.unregister<DoctorDetailsUseCase>();
+  }
+}
+
+initDoctorDetails() {
   initDoctorDetailsRequest();
 
-  if(!Get.isRegistered<DoctorDetailsController>()){}
+  if (!Get.isRegistered<DoctorDetailsController>()) {}
   Get.put<DoctorDetailsController>(DoctorDetailsController());
+}
+
+disposeDoctorDetails() {
+  disposeDoctorDetailsRequest();
+
+  if (Get.isRegistered<DoctorDetailsController>()) {}
+  Get.delete<DoctorDetailsController>();
 }

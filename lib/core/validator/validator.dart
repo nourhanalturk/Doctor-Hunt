@@ -57,4 +57,15 @@ class FieldValidator {
     }
     return null;
   }
+
+  String? validateDate(value){
+    if (value == null || value.isEmpty) {
+      return ManagerStrings.pleaseEnterADate;
+    }
+    final regex = RegExp(r'^([0-2][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4}$');
+    if (!regex.hasMatch(value)) {
+      return ManagerStrings.enterDateInDDMMYYYYFormat;
+    }
+    return null;
+  }
 }

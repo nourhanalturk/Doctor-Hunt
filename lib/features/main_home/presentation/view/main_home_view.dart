@@ -5,8 +5,9 @@ import 'package:tender/core/resources/manager_opacity.dart';
 import 'package:tender/core/resources/manager_radius.dart';
 import 'package:tender/core/widgets/main_background.dart';
 import 'package:tender/features/main_home/presentation/controller/main_home_controller.dart';
-
+import 'package:tender/features/main_home/presentation/view/build_bottom_nav_container.dart';
 import '../../../../config/constants/constants.dart';
+import '../../../main_container/presentation/controller/main_container_controller.dart';
 
 class MainHomeView extends StatelessWidget {
   const MainHomeView({super.key});
@@ -17,30 +18,15 @@ class MainHomeView extends StatelessWidget {
     return GetBuilder<MainHomeController>(
       builder: (controller) {
         return AppScaffold(
-          bottomNavigationBar: Container(
-            height: size.height * ManagerOpacity.op0_1,
-            decoration: BoxDecoration(
-              color: ManagerColors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(
-                  ManagerRadius.r25,
-                ),
-                topRight: Radius.circular(
-                  ManagerRadius.r25,
-                ),
-              ),
-            ),
-            child: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.transparent,
-              elevation: Constants.zeroElevation,
-              items: controller.items,
-              currentIndex: controller.currentBottomNavIndex,
-              onTap: (index) {
-                controller.changeBottomNavIndex(index);
-              },
-            ),
-          ),
+          bottomNavigationBar: controller.currentBottomNavIndex==0 ? GetBuilder<MainContainerController>(
+            builder: (mainController) {
+              print("Bottom nav visibility: ${mainController.isBottomNavShown}");
+
+              return mainController.isBottomNavShown
+                  ? buildBottomNavContainer(controller, size)
+                  : const SizedBox();
+            },
+          ): buildBottomNavContainer(controller, size),
           body: controller.pages[controller.currentBottomNavIndex],
         );
       },

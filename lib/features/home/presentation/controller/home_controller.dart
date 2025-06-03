@@ -53,11 +53,16 @@ class HomeController extends GetxController {
   ];
   List<HomeModel> homeSections = [];
   String errorMessage = '';
+  bool isLoading = true ;
 
   homeRequest() async {
+    isLoading = true ;
+    update();
     HomeUsecase useCase = instance<HomeUsecase>();
     (await useCase.execute()).fold(
       (l) async {
+        isLoading =false ;
+        update();
         if (l.message.contains(ManagerStrings.authException) ||
             l.message.contains(ManagerStrings.refreshFailed) ||
             l.message.contains(ManagerStrings.tokenExpired)) {
@@ -82,6 +87,7 @@ class HomeController extends GetxController {
         homeSections.clear();
       },
       (sections) {
+        isLoading =false ;
         filterSections(sections);
         update();
       },

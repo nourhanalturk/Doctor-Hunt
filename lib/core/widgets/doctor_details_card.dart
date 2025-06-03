@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tender/config/di/di.dart';
 import 'package:tender/core/extensions/extensions.dart';
-import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/favorites/presentation/controller/favorites_controller.dart';
 import '../enums/doctor_card_enum.dart';
 import '../resources/manager_colors.dart';
@@ -58,22 +56,27 @@ Widget mainDoctorCard({
         children: [
           Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(
-                  ManagerRadius.r12,
+              Container(
+                width: size.width * 0.23,
+                height: size.width * 0.25,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(ManagerRadius.r12),
                 ),
-                child: isDebug ?? false
-                    ? Image.asset(
-                        image,
-                        height:
-                            imageHeight ?? size.height * ManagerOpacity.op0_13,
-                      )
-                    : Image.network(
-                        image,
-                        height:
-                            imageHeight ?? size.height * ManagerOpacity.op0_13,
-                      ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(ManagerRadius.r12),
+                  child: isDebug ?? false
+                      ? Image.asset(
+                    image.onNull(),
+                    fit: BoxFit.cover,
+                  )
+                      : Image.network(
+                    image.onNull(),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                  ),
+                ),
               ),
+
               SizedBox(
                 width: ManagerWidth.w15,
               ),

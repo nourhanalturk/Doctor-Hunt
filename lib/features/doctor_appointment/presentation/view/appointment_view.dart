@@ -20,6 +20,7 @@ import '../../../../core/resources/manager_font_size.dart';
 import '../../../../core/resources/manager_radius.dart';
 import '../../../../core/resources/manager_styles.dart';
 import '../../../../core/widgets/doctor_details_card.dart';
+import '../../../../core/widgets/shimmer/shimmer_time_circle.dart';
 
 class DoctorAppointmentView extends StatelessWidget {
   const DoctorAppointmentView({super.key});
@@ -217,9 +218,8 @@ class DoctorAppointmentView extends StatelessWidget {
                             child: Padding(
                               padding: EdgeInsets.only(
                                 top: ManagerHeight.h20,
-                                left:  ManagerWidth.w30,
+                                left: ManagerWidth.w30,
                                 right: ManagerWidth.w30,
-
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,79 +234,101 @@ class DoctorAppointmentView extends StatelessWidget {
                                   SizedBox(
                                     height: size.height * ManagerOpacity.op0_01,
                                   ),
-                                  controller.availableTimes.isEmpty
-                                      ? Center(
-                                          child: Text(
-                                            ManagerStrings
-                                                .noAvailableTimeForTheDoctorToday,
-                                            style: getBoldTextStyle(
-                                              fontSize: ManagerFontSize.s20,
-                                              color: ManagerColors.primaryColor,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        )
-                                      : SizedBox(
+                                  controller.isAvailableTimesLoading
+                                      ? SizedBox(
                                           height: size.height *
                                               ManagerOpacity.op0_12,
                                           child: ListView.separated(
                                             scrollDirection: Axis.horizontal,
-                                            itemCount: controller
-                                                .availableTimes.length,
-                                            separatorBuilder:
-                                                (context, index) => SizedBox(
-                                                    width: ManagerWidth.w10),
-                                            itemBuilder: (context, index) {
-                                              return InkWell(
-                                                onTap: () {
-                                                  controller.appointmentTime =
+                                            itemCount: 6,
+                                            separatorBuilder: (_, __) =>
+                                                SizedBox(
+                                              width: ManagerWidth.w10,
+                                            ),
+                                            itemBuilder: (_, __) =>
+                                                const ShimmerTimeCircle(),
+                                          ),
+                                        )
+                                      : controller.availableTimes.isEmpty
+                                          ? Center(
+                                              child: Text(
+                                                ManagerStrings
+                                                    .noAvailableTimeForTheDoctorToday,
+                                                style: getBoldTextStyle(
+                                                  fontSize: ManagerFontSize.s20,
+                                                  color: ManagerColors
+                                                      .primaryColor,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              height: size.height *
+                                                  ManagerOpacity.op0_12,
+                                              child: ListView.separated(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount: controller
+                                                    .availableTimes.length,
+                                                separatorBuilder: (context,
+                                                        index) =>
+                                                    SizedBox(
+                                                        width:
+                                                            ManagerWidth.w10),
+                                                itemBuilder: (context, index) {
+                                                  return InkWell(
+                                                    onTap: () {
                                                       controller
-                                                              .rawAvailableTimes[
-                                                          index];
-                                                  controller
-                                                      .onSelectTime(index);
-                                                },
-                                                child: Container(
-                                                  height: size.height *
-                                                      ManagerOpacity.op0_1,
-                                                  width: size.width *
-                                                      ManagerOpacity.op0_2,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: controller
-                                                                .appointmentTimeSelectedIndex ==
-                                                            index
-                                                        ? ManagerColors
-                                                            .primaryColor
-                                                        : ManagerColors
-                                                            .primaryColor
-                                                            .withOpacity(
-                                                            ManagerOpacity
-                                                                .op0_1,
-                                                          ),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      controller.availableTimes[
-                                                          index],
-                                                      style: getMediumTextStyle(
-                                                        fontSize:
-                                                            ManagerFontSize.s14,
+                                                              .appointmentTime =
+                                                          controller
+                                                                  .rawAvailableTimes[
+                                                              index];
+                                                      controller
+                                                          .onSelectTime(index);
+                                                    },
+                                                    child: Container(
+                                                      height: size.height *
+                                                          ManagerOpacity.op0_1,
+                                                      width: size.width *
+                                                          ManagerOpacity.op0_2,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
                                                         color: controller
                                                                     .appointmentTimeSelectedIndex ==
                                                                 index
                                                             ? ManagerColors
-                                                                .white
+                                                                .primaryColor
                                                             : ManagerColors
-                                                                .primaryColor,
+                                                                .primaryColor
+                                                                .withOpacity(
+                                                                ManagerOpacity
+                                                                    .op0_1,
+                                                              ),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          controller
+                                                                  .availableTimes[
+                                                              index],
+                                                          style:
+                                                              getMediumTextStyle(
+                                                            fontSize:
+                                                                ManagerFontSize
+                                                                    .s14,
+                                                            color: controller.appointmentTimeSelectedIndex ==
+                                                                    index
+                                                                ? ManagerColors
+                                                                    .white
+                                                                : ManagerColors
+                                                                    .primaryColor,
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                   Text(
                                     ManagerStrings.reminderMeBefore,
                                     style: getBoldTextStyle(

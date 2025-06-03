@@ -17,6 +17,7 @@ import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/core/widgets/custom_app_bar.dart';
 import 'package:tender/core/widgets/doctor_details_card.dart';
 import 'package:tender/core/widgets/main_background.dart';
+import 'package:tender/features/doctor_details/domain/di/di.dart';
 import 'package:tender/features/doctor_details/presentation/controller/doctor_details_controller.dart';
 
 import '../../../../core/widgets/shimmer/doctor_details_view_shimmer.dart';
@@ -42,20 +43,25 @@ class DoctorDetailsView extends StatelessWidget {
                   child: ListView(
                     children: [
                       customAppBar(
-                          onSearchButtonPressed: () {},
-                          appBarTitle: ManagerStrings.doctorDetails,
-                          isSearchButtonAppear: true),
+                        onSearchButtonPressed: () {},
+                        appBarTitle: ManagerStrings.doctorDetails,
+                        isSearchButtonAppear: true,
+                        onArrowBackTapped: () {
+                          disposeDoctorDetails();
+                          Get.back();
+                        },
+                      ),
                       SizedBox(
                         height: size.height * ManagerOpacity.op0_02,
                       ),
                       mainDoctorCard(
-                        image: controller.image,
-                        doctorName: controller.doctorName,
-                        doctorSpeciality: controller.doctorSpeciality,
+                        image: controller.image.onNull(),
+                        doctorName: controller.doctorName.onNull(),
+                        doctorSpeciality: controller.doctorSpeciality.onNull(),
                         onFavoritesPressed: () {},
                         cardEnum: DoctorCardEnum.doctorDetailsCard,
                         costPerHour: controller.coastPerHour.toString(),
-                        doctorRate: controller.rating,
+                        doctorRate: controller.rating.onNull(),
                         onBookNowButtonPressed: () {
                           controller.navigateToAppointment();
                         },
@@ -238,8 +244,10 @@ class DoctorDetailsView extends StatelessWidget {
                                 markers: [
                                   Marker(
                                     point: controller.coordinates,
-                                    child: const Icon(Icons.location_on,
-                                        color: Colors.red),
+                                    child: const Icon(
+                                      Icons.location_on,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ],
                               ),

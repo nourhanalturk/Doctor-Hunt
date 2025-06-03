@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/core/widgets/main_background.dart';
+import 'package:tender/core/widgets/main_button.dart';
 import 'package:tender/core/widgets/text_field.dart';
 import 'package:tender/features/medical_records/presentation/controller/medical_records_controller.dart';
-import 'package:tender/features/medical_records/presentation/view/widgets/build_type_of_records.dart';
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/resources/manager_font_size.dart';
 import '../../../../core/resources/manager_height.dart';
@@ -45,44 +45,46 @@ class AddMedicalRecordView extends StatelessWidget {
                 ),
                 child: SizedBox(
                   height: size.height * ManagerOpacity.op0_2,
-
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
                       if (controller.selectedImage != null)
                         Row(
-                          children: List.generate(controller.selectedImage!.length, (index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                width: size.width * ManagerOpacity.op0_3,
-                                height: size.height * ManagerOpacity.op0_17,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(
-                                    ManagerRadius.r12,
+                          children: List.generate(
+                            controller.selectedImage!.length,
+                            (index) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  width: size.width * ManagerOpacity.op0_3,
+                                  height: size.height * ManagerOpacity.op0_17,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                      ManagerRadius.r12,
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                        ManagerRadius.r12),
+                                    child: Image.file(
+                                      File(controller
+                                          .selectedImage![index].path),
+                                      width: 200,
+                                      height: 200,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius:
-                                  BorderRadius.circular(ManagerRadius.r12),
-                                  child: Image.file(
-                                    File(controller.selectedImage![index].path),
-                                    width: 200,
-                                    height: 200,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },),
+                              );
+                            },
+                          ),
                         ),
                       SizedBox(
                         width: ManagerWidth.w20,
                       ),
                       GestureDetector(
                         onTap: () {
-                          controller.onTakePhotoPressed(1);
-
+                          controller.onUploadFromGalleryPressed();
                         },
                         child: Container(
                           width: size.width * ManagerOpacity.op0_3,
@@ -119,7 +121,7 @@ class AddMedicalRecordView extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: size.height * ManagerOpacity.op0_2,
+                height: size.height * ManagerOpacity.op0_1,
               ),
               Expanded(
                 child: Container(
@@ -140,8 +142,7 @@ class AddMedicalRecordView extends StatelessWidget {
                       vertical: ManagerHeight.h23,
                       horizontal: ManagerWidth.w40,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: ListView(
                       children: [
                         Text(
                           ManagerStrings.recordFor,
@@ -150,13 +151,10 @@ class AddMedicalRecordView extends StatelessWidget {
                             color: ManagerColors.black,
                           ),
                         ),
-                        SizedBox(
-                          height: size.height * ManagerOpacity.op0_01,
-                        ),
                         Row(
                           children: [
                             Text(
-                              controller.patientName ?? 'Nourhan',
+                              controller.patientName!,
                               style: getBoldTextStyle(
                                 fontSize: ManagerFontSize.s22,
                                 color: ManagerColors.primaryColor,
@@ -210,36 +208,94 @@ class AddMedicalRecordView extends StatelessWidget {
                         ),
                         containerSpacer(),
                         SizedBox(
-                          height: size.height * ManagerOpacity.op0_01,
+                          height: size.height * ManagerOpacity.op0_02,
                         ),
                         Text(
-                          ManagerStrings.typeOfRecord,
+                          ManagerStrings.diseaseName,
                           style: getMediumTextStyle(
                             fontSize: ManagerFontSize.s20,
                             color: ManagerColors.black,
                           ),
                         ),
+                        textField(controller: controller.diseaseNameController),
+                        SizedBox(
+                          height: size.height * ManagerOpacity.op0_02,
+                        ),
+                        Text(
+                          ManagerStrings.description,
+                          style: getMediumTextStyle(
+                            fontSize: ManagerFontSize.s20,
+                            color: ManagerColors.black,
+                          ),
+                        ),
+                        textField(
+                          controller: controller.description,
+                        ),
+                        SizedBox(
+                          height: size.height * ManagerOpacity.op0_02,
+                        ),
+                        Text(
+                          ManagerStrings.doctorName,
+                          style: getMediumTextStyle(
+                            fontSize: ManagerFontSize.s20,
+                            color: ManagerColors.black,
+                          ),
+                        ),
+                        textField(
+                          controller: controller.doctorName,
+                        ),
+                        SizedBox(
+                          height: size.height * ManagerOpacity.op0_02,
+                        ),
+                        Text(
+                          ManagerStrings.reportDate,
+                          style: getMediumTextStyle(
+                            fontSize: ManagerFontSize.s20,
+                            color: ManagerColors.black,
+                          ),
+                        ),
+                        TextFormField(
+                          controller: controller.dateController,
+                          keyboardType: TextInputType.datetime,
+                          decoration: const InputDecoration(
+                            labelText: 'Report Date (DD/MM/YYYY)',
+                            border: OutlineInputBorder(),
+                          ),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[\d/]'),
+                            ),
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          validator: (value) {
+                            controller.validator.validateDate(value);
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: size.height * ManagerOpacity.op0_02,
+                        ),
+                        Text(
+                          ManagerStrings.medicineNames,
+                          style: getMediumTextStyle(
+                            fontSize: ManagerFontSize.s20,
+                            color: ManagerColors.black,
+                          ),
+                        ),
+                        textField(
+                          controller: controller.medicineNames,
+                          borderColor: ManagerColors.primaryColor,
+                        ),
                         SizedBox(
                           height: size.height * ManagerOpacity.op0_01,
                         ),
-                        Row(
-                          children: List.generate(
-                            controller.recordTypes.length,
-                            (index) {
-                              var model = controller.recordTypes[index];
-                              return typeOfRecords(
-                                iconPath: model.icon,
-                                title: model.title,
-                                onTap: () {
-                                  controller.changeSelectedRecordType(index);
-                                },
-                                selectedIndex: controller.selectedRecordIndex,
-                                currentIndex: index ,
-                              );
-                            },
-                          ),
-                        ),
-                        containerSpacer()
+                        containerSpacer(),
+                        mainButton(
+                          onPressed: () {
+                            controller.addRecord();
+                          },
+                          buttonText: ManagerStrings.add,
+                        )
                       ],
                     ),
                   ),

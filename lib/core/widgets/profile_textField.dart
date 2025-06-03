@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_height.dart';
 import '../resources/manager_colors.dart';
 import '../resources/manager_font_size.dart';
@@ -6,7 +7,7 @@ import '../resources/manager_radius.dart';
 import '../resources/manager_styles.dart';
 
 Widget profileTextField(
-    {required String labelText, required TextEditingController controller,Widget? suffixIcon,}) {
+    { String? labelText, required TextEditingController controller,Widget? suffixIcon,String? hintText,Widget? prefixIcon}) {
   return TextField(
     controller: controller,
     decoration: InputDecoration(
@@ -16,14 +17,16 @@ Widget profileTextField(
       label: Padding(
         padding: EdgeInsets.only(top:ManagerHeight.h30,),
         child: Text(
-          labelText,
+          labelText.onNull(),
           style: getBoldTextStyle(
             fontSize: ManagerFontSize.s17,
             color: ManagerColors.primaryColor,
           ),
         ),
       ),
+      hintText: hintText,
       suffixIcon:suffixIcon,
+      prefixIcon: prefixIcon,
       contentPadding: EdgeInsets.only(
         top: ManagerHeight.h24,
         bottom: ManagerHeight.h12,

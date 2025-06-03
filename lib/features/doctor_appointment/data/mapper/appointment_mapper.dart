@@ -1,5 +1,5 @@
 import 'package:tender/core/extensions/extensions.dart';
-import '../../model/model/appointment_model.dart';
+import '../../domain/model/appointment_model.dart';
 import '../response/appointment_response.dart';
 
 extension AppointmentMapper on AddAppointmentResponse {

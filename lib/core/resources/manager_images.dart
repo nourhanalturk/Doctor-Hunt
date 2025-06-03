@@ -20,7 +20,7 @@ class ManagerImages {
 
   static const String helpCenter = '$imagesPath/help-center.svg';
   static const String medicalOrders = '$imagesPath/medical-orders.svg';
-  static const String medicalRecords = '$imagesPath/medical-record.svg';
+  static const String medicalRecords = '$imagesPath/medical-records.svg';
   static const String paymentsIcon = '$imagesPath/payments-icon.svg';
   static const String privacyPolicy = '$imagesPath/privacy-policy.svg';
   static const String setting = '$imagesPath/setting.svg';
@@ -30,6 +30,28 @@ class ManagerImages {
   static const String camera = '$imagesPath/camera.svg';
   static const String imageIcon = '$imagesPath/image.svg';
   static const String pdfIcon = '$imagesPath/pdf-icon.svg';
+  static const String myDoctors = '$imagesPath/my-doctors.svg';
+  static const String arrowForward = '$imagesPath/arrow-forward.svg';
+  static const String arrowBack = '$imagesPath/arrow_back.svg';
+  static const String aboutUsIcon = '$imagesPath/about-us.svg';
+  static const String lockIcon = '$imagesPath/lock.svg';
+  static const String statisticsIcon = '$imagesPath/statistics.svg';
+  static const String timerNotificationIcon = '$imagesPath/timer-notification-icon.svg';
+
+  static const String orderReturns = '$imagesPath/order-returns.svg';
+  static const String paymentRefunds = '$imagesPath/payment-refunds.svg';
+  static const String orderDelivery = '$imagesPath/order-delivery.svg';
+  static const String orderStatus = '$imagesPath/order-status.svg';
+  static const String prescriptionIssues = '$imagesPath/prescription-issues.svg';
+  static const String guidOrders = '$imagesPath/guid-orders.svg';
+
+
+  static const String eReports = '$imagesPath/e-reports.svg';
+  static const String freeFollowUp = '$imagesPath/free-follow-up.svg';
+  static const String practoLabs = '$imagesPath/practo-labs.svg';
+  static const String cartIcon = '$imagesPath/cart-icon.svg';
+  static const String liveDoctorImage = '$imagesPath/live-doctor-image.jpg';
+  static const String playIcon = '$imagesPath/play-icon.svg';
 
 
 

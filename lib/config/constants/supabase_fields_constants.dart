@@ -1,4 +1,6 @@
 class SupabaseFieldsConstants {
+  static const String id = 'id';
+  static const String name = 'name';
   static const String doctorId = 'doctor_id';
   static const String availableDate = 'available_date';
   static const String availableTime = 'available_time';
@@ -16,4 +18,17 @@ class SupabaseFieldsConstants {
   static const String status = 'status';
 
   static const userId = 'user_id';
+  static const String patientName = 'patient_name';
+  static const String diseaseName = 'disease_name';
+  static const String description = 'description';
+  static const String doctorName = 'doctor_name';
+  static const String medicineNames = 'medicine_names';
+  static const String reportDate = 'report_date';
+  static const String imageUrls = 'image_urls';
+  static const String recordFor = 'record_for';
+
+  static const String chatId = 'chat_id';
+  static const String lastMessage = 'last_message';
+  static const String image = 'image';
+
 }

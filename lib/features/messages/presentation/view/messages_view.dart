@@ -6,6 +6,7 @@ import 'package:tender/core/resources/manager_icons.dart';
 import 'package:tender/core/resources/manager_opacity.dart';
 import 'package:tender/core/widgets/main_background.dart';
 import 'package:tender/core/widgets/text_field.dart';
+import 'package:tender/features/messages/domain/di/di.dart';
 import 'package:tender/features/messages/presentation/controller/messages_controller.dart';
 import 'package:tender/features/messages/presentation/view/widget/message_item.dart';
 
@@ -45,6 +46,7 @@ class MessagesView extends StatelessWidget {
                     children: [
                       IconButton(
                           onPressed: () {
+                            disposeMessages();
                             Get.back();
                           },
                           icon: Icon(

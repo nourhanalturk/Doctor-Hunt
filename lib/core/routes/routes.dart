@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:tender/features/bookings/domain/di/di.dart';
+import 'package:tender/features/bookings/presentation/view/bookings_view.dart';
 import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/doctor_details/domain/di/di.dart';
 import 'package:tender/features/doctor_details/presentation/view/doctor_details_view.dart';
+import 'package:tender/features/health-checkups/domain/di/di.dart';
+import 'package:tender/features/health-checkups/presentation/view/health_checkups_view.dart';
 import 'package:tender/features/login/domain/di/di.dart';
 import 'package:tender/features/login/presentation/view/login_view.dart';
+import 'package:tender/features/main_container/domain/di/di.dart';
+import 'package:tender/features/main_container/presentation/view/main_container_view.dart';
 import 'package:tender/features/main_home/domain/di/di.dart';
 import 'package:tender/features/main_home/presentation/view/main_home_view.dart';
 import 'package:tender/features/medical_records/domain/di/di.dart';
@@ -15,13 +21,17 @@ import 'package:tender/features/profile/domain/di/di.dart';
 import 'package:tender/features/profile/presentation/view/profile_view.dart';
 import 'package:tender/features/register/domain/di/di.dart';
 import 'package:tender/features/register/presentation/view/register_view.dart';
+import 'package:tender/features/settings/domain/di/di.dart';
+import 'package:tender/features/settings/presentation/view/settings_view.dart';
 import 'package:tender/features/splash/domain/di.dart';
 import 'package:tender/features/splash/presentation/view/splash_view.dart';
 import '../../features/chat/presentation/view/chats_view.dart';
-import '../../features/doctor_appointment/model/di/di.dart';
+import '../../features/doctor_appointment/domain/di/di.dart';
 import '../../features/doctor_appointment/presentation/view/appointment_view.dart';
 import '../../features/home/domain/di/di.dart';
 import '../../features/home/presentation/view/home_view.dart';
+import '../../features/medicine_orders/domain/di/di.dart';
+import '../../features/medicine_orders/presentation/view/medicine_orders_view.dart';
 import '../../features/messages/domain/di/di.dart';
 import '../../features/messages/presentation/view/messages_view.dart';
 import '../../features/out_boarding/domain/di.dart';
@@ -44,6 +54,12 @@ class Routes {
   static const String addRecord = '/addRecord';
   static const String chats = '/chats';
   static const String messages = '/messages';
+  static const String mainContainer = '/mainContainer';
+  static const String medicalOrders = '/medicalOrders';
+  static const String settings = '/settings';
+  static const String bookings = '/bookings';
+  static const String healthCheckups = '/healthCheckups';
+
 }
 
 class RouteGenerator {
@@ -119,8 +135,31 @@ class RouteGenerator {
         return MaterialPageRoute(
           builder: (context) => const MessagesView(),
         );
-
-
+      case Routes.mainContainer:
+        initMainContainer();
+        return MaterialPageRoute(
+          builder: (context) => const MainContainerView(),
+        );
+      case Routes.medicalOrders:
+        initMedicineOrders();
+        return MaterialPageRoute(
+          builder: (context) => const MedicineOrdersView(),
+        );
+      case Routes.settings:
+        initSettings();
+        return MaterialPageRoute(
+          builder: (context) => const SettingsView(),
+        );
+      case Routes.bookings:
+        initBookings();
+        return MaterialPageRoute(
+          builder: (context) => const BookingsView(),
+        );
+      case Routes.healthCheckups:
+        initHealthCheckups();
+        return MaterialPageRoute(
+          builder: (context) => const HealthCheckupsView(),
+        );
       default:
         return unDefinedRoute();
     }

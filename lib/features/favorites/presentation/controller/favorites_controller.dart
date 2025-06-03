@@ -3,10 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/features/doctor_details/domain/di/di.dart';
 import 'package:tender/features/favorites/domain/use_case/favorites_usecase.dart';
-
-import '../../../doctor_details/data/request/doctor_details_request.dart';
-import '../../../doctor_details/domain/model/doctor_details_model.dart';
-import '../../../doctor_details/domain/usecase/doctor_details_usecase.dart';
 import '../../domain/model/favorite_doctor_model.dart';
 
 class FavoritesController extends GetxController {
@@ -17,8 +13,6 @@ class FavoritesController extends GetxController {
 
   Future<void> loadFavorites(String userId) async {
     GetFavoritesUseCase useCase = instance<GetFavoritesUseCase>();
-    isLoading = true;
-    update();
 
     final result = await useCase.execute(userId);
     result.fold(
@@ -29,7 +23,6 @@ class FavoritesController extends GetxController {
       },
     );
 
-    isLoading = false;
     update();
   }
 
@@ -61,28 +54,34 @@ class FavoritesController extends GetxController {
   List<FavoriteDoctorModel> doctors = [];
 
   Future<void> loadFavoriteDoctors() async {
-    //if (favoriteIds.isEmpty) return;
+    isLoading = true;
+    update();
     initDoctorDetailsRequest();
-    String userId = supabase.auth.currentUser!.id ;
+    String userId = supabase.auth.currentUser!.id;
 
-    final response = await supabase
+    await supabase
         .from('favorite_doctors_view')
         .select()
-        .eq('user_id', userId);
-
-    final favoriteDoctors = response.map((e) => FavoriteDoctorModel.fromJson(e)).toList();
-
-    doctors =favoriteDoctors;
-    update();
-    print(doctors);
-
+        .eq('user_id', userId)
+        .then(
+      (value) {
+        final favoriteDoctors =
+            value.map((e) => FavoriteDoctorModel.fromJson(e)).toList();
+        doctors = favoriteDoctors;
+        isLoading = false;
+        update();
+      },
+    ).catchError((e) {
+      isLoading = false;
+      update();
+    });
   }
 
   @override
   void onInit() {
+    loadFavoriteDoctors();
     final userId = Supabase.instance.client.auth.currentUser;
     loadFavorites(userId!.id);
-    loadFavoriteDoctors();
     super.onInit();
   }
 }

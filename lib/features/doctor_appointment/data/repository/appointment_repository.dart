@@ -6,7 +6,7 @@ import '../../../../config/constants/response_constants.dart';
 import '../../../../core/error_handler/failure.dart';
 import '../../../../core/error_handler/server_failure.dart';
 import '../../../../core/resources/manager_strings.dart';
-import '../../model/model/appointment_model.dart';
+import '../../domain/model/appointment_model.dart';
 import '../data_source/appointment.dart';
 import '../request/appointment_request.dart';
 
