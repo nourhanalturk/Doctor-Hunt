@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
@@ -11,16 +10,14 @@ import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
+import 'package:tender/core/service/notifications_service.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/doctor_appointment/data/request/appointment_request.dart';
 
 import '../../../../config/constants/constants.dart';
 import '../../../../config/constants/supabase_fields_constants.dart';
 import '../../../../config/constants/supabase_tables_constants.dart';
-import '../../../../core/error_handler/error_handler.dart';
 import '../../../../core/helpers/upload_image_helper.dart';
-import '../../../../core/internet_checker/internet_checker.dart';
-import '../../../../core/internet_checker/is_network_working.dart';
 import '../../domain/di/di.dart';
 import '../../domain/usecase/appointment_usecase.dart';
 import '../view/widget/success_appointment_dialog.dart';
@@ -45,9 +42,24 @@ class DoctorAppointmentController extends GetxController {
   List<int> reminderTimes = [30, 40, 25, 10, 35];
   int reminderTimeIndex = 0;
 
-  onReminderTimesPressed(int index) {
+  onReminderTimesPressed(int index , DateTime appointmentTimeReminder) {
     reminderTimeIndex = index;
+    setReminderNotification(reminderTimes[index],appointmentTimeReminder);
     update();
+  }
+
+  setReminderNotification(int reminderMinutesBefore ,DateTime appointmentTimeUtc)async{
+    await NotiService().initNotification();
+
+    final now = DateTime.now();
+    final testTime = now.add(Duration(seconds: 15));
+
+    // 3. Schedule with hardcoded values
+    await NotiService().scheduleNotification(
+
+    );
+
+    print('Notification scheduled for ${testTime.toString()}');
   }
 
   onSelectTime(int index) {

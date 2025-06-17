@@ -15,6 +15,7 @@ import '../../../../core/cache/app_cache.dart';
 import '../../../../core/resources/manager_strings.dart';
 import '../../../../core/storage/local/app_settings_prefs.dart';
 import '../../../../core/validator/validator.dart';
+import '../../../favorites/domain/di/di.dart';
 
 class RegisterController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -67,8 +68,9 @@ class RegisterController extends GetxController {
         .signUp(password: passwordController.text, email: emailController.text)
         .then(
       (value) async {
+        await initFavorites();
         AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-        prefs.setUserLoggedIn();
+        prefs.setIsUserLoggedIn(true);
         prefs.setPatientName(nameController.text);
         CacheData.setEmail(value: emailController.text);
         CacheData.setUserName(name: nameController.text);
@@ -77,6 +79,11 @@ class RegisterController extends GetxController {
         await addPatientAfterSignup(value.user!.id);
       },
     ).catchError((error) {
+      dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: error,
+          title: '');
       final errorMessage =
           error is AuthException ? error.message : ManagerStrings.unknown;
 
@@ -101,10 +108,14 @@ class RegisterController extends GetxController {
       title: ManagerStrings.sessionFinished,
     );
     AddPatientUseCase useCase = instance<AddPatientUseCase>();
-    (await useCase.execute(AddPatientRequest(
-            patientId: userId,
-            fullName: nameController.text,
-            contactNumber: '0599')))
+    (await useCase.execute(
+      AddPatientRequest(
+        patientId: userId,
+        fullName: nameController.text,
+        contactNumber: '0599',
+        profileImageUrl: Constants.defaultImageUrl,
+      ),
+    ))
         .fold(
       (l) {
         dialogRender(
@@ -115,8 +126,11 @@ class RegisterController extends GetxController {
         );
       },
       (r) {
-        AppSettingsPrefs prefs =instance<AppSettingsPrefs>();
+        AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
         prefs.setPatientUid(r.patientId);
+        print(prefs.getPatientUid());
+        prefs.setPatientName(nameController.text);
+        prefs.setUserImage(imagePath: Constants.defaultImageUrl);
         dialogRender(
           context: Get.context!,
           stateRenderType: StateRenderType.popUpSuccessState,

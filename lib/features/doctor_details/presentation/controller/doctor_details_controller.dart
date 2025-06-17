@@ -90,7 +90,7 @@ class DoctorDetailsController extends GetxController {
 
   createOrOpenChat() async {
     AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-    String patientUid = prefs.getPatientUid();
+    String patientUid = supabase.auth.currentUser!.id;
 
     final existingResponse = await supabase
         .from('all_chats')
@@ -118,6 +118,7 @@ class DoctorDetailsController extends GetxController {
         .single();
     final chatUid =await newChatResponse['chat_id'];
     CacheData.setChatUid(chatUid);
+
     Get.toNamed(Routes.messages);
 
   }

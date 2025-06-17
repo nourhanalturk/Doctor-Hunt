@@ -1,20 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:tender/core/extensions/extensions.dart';
-import 'package:tender/core/resources/manager_colors.dart';
-import 'package:tender/core/resources/manager_font_size.dart';
-import 'package:tender/core/resources/manager_height.dart';
-import 'package:tender/core/resources/manager_icons.dart';
-import 'package:tender/core/resources/manager_images.dart';
-import 'package:tender/core/resources/manager_radius.dart';
 import 'package:tender/core/resources/manager_strings.dart';
-import 'package:tender/core/resources/manager_styles.dart';
-import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/core/widgets/auth_view.dart';
 import 'package:tender/core/widgets/main_background.dart';
-import 'package:tender/core/widgets/main_button.dart';
-import 'package:tender/core/widgets/text_field.dart';
 import 'package:tender/features/login/presentation/controller/login_controller.dart';
 import 'package:tender/features/login/presentation/view/widgets/forgot_password.dart';
 import 'package:tender/features/login/presentation/view/widgets/otp_bottom_sheet.dart';
@@ -27,6 +15,7 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return AppScaffold(
       body: GetBuilder<LoginController>(
         builder: (controller) {

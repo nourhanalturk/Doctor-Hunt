@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
+import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/doctor_details/domain/di/di.dart';
 import 'package:tender/features/favorites/domain/use_case/favorites_usecase.dart';
 import '../../domain/model/favorite_doctor_model.dart';
@@ -57,12 +58,13 @@ class FavoritesController extends GetxController {
     isLoading = true;
     update();
     initDoctorDetailsRequest();
-    String userId = supabase.auth.currentUser!.id;
+    final currentUser = supabase.auth.currentUser;
+    if (currentUser == null) return;
 
     await supabase
         .from('favorite_doctors_view')
         .select()
-        .eq('user_id', userId)
+        .eq('user_id', currentUser.id)
         .then(
       (value) {
         final favoriteDoctors =
@@ -81,7 +83,10 @@ class FavoritesController extends GetxController {
   void onInit() {
     loadFavoriteDoctors();
     final userId = Supabase.instance.client.auth.currentUser;
-    loadFavorites(userId!.id);
+    if (userId != null) {
+      loadFavorites(userId.id);
+    }
+
     super.onInit();
   }
 }

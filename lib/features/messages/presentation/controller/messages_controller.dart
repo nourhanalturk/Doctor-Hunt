@@ -10,6 +10,7 @@ class MessagesController extends GetxController {
   late String chatUid;
   List<MessageModel> messages = [];
 
+
   fetchMessages() async {
     chatUid = CacheData.chatUid;
     final currentUid = supabase.auth.currentUser?.id;
@@ -83,6 +84,7 @@ class MessagesController extends GetxController {
   @override
   void onInit() {
     chatUid = CacheData.chatUid;
+
     fetchMessages();
     listenToNewMessages();
     super.onInit();

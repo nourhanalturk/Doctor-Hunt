@@ -12,6 +12,7 @@ import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/chat/presentation/view/chats_view.dart';
 import 'package:tender/features/home/domain/di/di.dart';
 import 'package:tender/features/home/presentation/view/home_view.dart';
+import 'package:tender/features/main_container/domain/di/di.dart';
 import 'package:tender/features/main_container/presentation/controller/main_container_controller.dart';
 import 'package:tender/features/main_container/presentation/view/main_container_view.dart';
 import '../../../../core/resources/manager_colors.dart';

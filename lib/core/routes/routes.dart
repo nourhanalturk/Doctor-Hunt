@@ -15,8 +15,12 @@ import 'package:tender/features/main_home/presentation/view/main_home_view.dart'
 import 'package:tender/features/medical_records/domain/di/di.dart';
 import 'package:tender/features/medical_records/presentation/view/add_medical_record_view.dart';
 import 'package:tender/features/medical_records/presentation/view/medical_records_view.dart';
+import 'package:tender/features/my_doctors/domain/di/di.dart';
+import 'package:tender/features/my_doctors/presentation/view/my_doctors_view.dart';
 import 'package:tender/features/out_boarding/presentation/view/out_boarding_view.dart';
 import 'package:tender/features/popular_doctor/presentation/view/popular_doctors_view.dart';
+import 'package:tender/features/privacy_and_policy/domain/di/di.dart';
+import 'package:tender/features/privacy_and_policy/presentation/view/privacy_and_policy_view.dart';
 import 'package:tender/features/profile/domain/di/di.dart';
 import 'package:tender/features/profile/presentation/view/profile_view.dart';
 import 'package:tender/features/register/domain/di/di.dart';
@@ -59,6 +63,8 @@ class Routes {
   static const String settings = '/settings';
   static const String bookings = '/bookings';
   static const String healthCheckups = '/healthCheckups';
+  static const String myDoctors = '/myDoctors';
+  static const String privacyAndPolicy = '/privacyAndPolicy';
 
 }
 
@@ -159,6 +165,16 @@ class RouteGenerator {
         initHealthCheckups();
         return MaterialPageRoute(
           builder: (context) => const HealthCheckupsView(),
+        );
+      case Routes.myDoctors:
+        initMyDoctors();
+        return MaterialPageRoute(
+          builder: (context) => const MyDoctorsView(),
+        );
+      case Routes.privacyAndPolicy:
+        initPrivacy();
+        return MaterialPageRoute(
+          builder: (context) => const PrivacyAndPolicyView(),
         );
       default:
         return unDefinedRoute();

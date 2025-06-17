@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/resources/manager_images.dart';
 import 'package:tender/core/resources/manager_strings.dart';
@@ -15,17 +16,27 @@ class MainContainerController extends GetxController
   int selectedTapIndex = 0;
 
   bool isBottomNavShown = true;
+  String userImage = '';
 
-  changeBottomNavStatus(value){
-    isBottomNavShown =value;
+  changeBottomNavStatus(value) {
+    isBottomNavShown = value;
     update();
   }
 
   List<MenuItemModel> items = [
     MenuItemModel(
+      imagePath: ManagerImages.testBooking,
+      title: ManagerStrings.myProfile,
+      onTap: () {
+        Get.toNamed(Routes.profile);
+      },
+    ),
+    MenuItemModel(
       imagePath: ManagerImages.myDoctors,
       title: ManagerStrings.myDoctors,
-      onTap: () {},
+      onTap: () {
+        Get.toNamed(Routes.myDoctors);
+      },
     ),
     MenuItemModel(
       imagePath: ManagerImages.medicalRecords,
@@ -47,14 +58,11 @@ class MainContainerController extends GetxController
       },
     ),
     MenuItemModel(
-      imagePath: ManagerImages.testBooking,
-      title: ManagerStrings.testBookings,
-      onTap: () {},
-    ),
-    MenuItemModel(
       imagePath: ManagerImages.privacyPolicy,
       title: ManagerStrings.privacyAndPolicy,
-      onTap: () {},
+      onTap: () {
+        Get.toNamed(Routes.privacyAndPolicy);
+      },
     ),
     MenuItemModel(
       imagePath: ManagerImages.helpCenter,
@@ -90,7 +98,8 @@ class MainContainerController extends GetxController
     });
 
     AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-    name = 'ramo'; //prefs.getPatientName();
+    name = prefs.getPatientName();
+    userImage = prefs.getUserImage();
     super.onInit();
   }
 
@@ -102,10 +111,16 @@ class MainContainerController extends GetxController
     }
   }
 
+  logOut() async {
+    AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
+    prefs.setIsUserLoggedIn(false);
+    Get.toNamed(Routes.login);
+    await Supabase.instance.client.auth.signOut();
+  }
+
   @override
   void onClose() {
     animationController.dispose();
-
     super.onClose();
   }
 }

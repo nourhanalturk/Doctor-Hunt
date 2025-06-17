@@ -12,6 +12,7 @@ Widget categoriesContainer({
   required Function()? onTap,
   double? height,
   double? width,
+  Widget? widget
 }) {
   var size = MediaQuery
       .of(Get.context!)
@@ -64,7 +65,7 @@ Widget categoriesContainer({
               ),
             ),
             Center(
-              child:SvgPicture.asset(icon!,color: ManagerColors.white,),
+              child:widget??SvgPicture.asset(icon!,color: ManagerColors.white,),
             ),
           ],
         ),

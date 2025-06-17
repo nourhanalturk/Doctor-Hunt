@@ -14,6 +14,7 @@ Widget menuItem({
   required String title,
   required void Function()? onTap ,
   required bool isSelected,
+  required bool isArrowAppear
 }) {
   var size = MediaQuery.of(Get.context!).size;
 
@@ -47,9 +48,9 @@ Widget menuItem({
                   ),
                 ),
                 const Spacer(),
-                SvgPicture.asset(
+               isArrowAppear? SvgPicture.asset(
                   ManagerImages.arrowForward,
-                ),
+                ) : const SizedBox(),
               ],
             ),
           ),

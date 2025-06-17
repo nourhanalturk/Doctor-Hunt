@@ -6,6 +6,8 @@ class ManagerStrings {
   static String get noRouteFound => tr('noRouteFound');
 
   static String get success => tr('success');
+  static String get ok => tr('ok');
+
 
   static String get skip => tr('skip');
   static String get live => tr('live');
@@ -463,6 +465,12 @@ class ManagerStrings {
 
   static String get appointmentBookedByYou => tr('appointmentBookedByYou');
   static String get noImageAttached => tr('noImageAttached');
+  static String get areYouSureToLogOut => tr('areYouSureToLogOut');
+  static String get newFullBodyHealthCheckupsAreAvailable => tr('newFullBodyHealthCheckupsAreAvailable');
+  static String get checkItNow => tr('checkItNow');
+  static String get myProfile => tr('myProfile');
+  static String get doctorHuntAppsPrivacyAndPolicy => tr('doctorHuntAppsPrivacyAndPolicy');
+
 
 
   static const String unauthorized = 'You are not authorized to perform this action.';

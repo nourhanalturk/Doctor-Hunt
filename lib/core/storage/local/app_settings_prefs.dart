@@ -28,11 +28,25 @@ class AppSettingsPrefs {
     return _sharedPreferences.getString(Constants.token).onNull();
   }
 
+  Future<void> setUserImage({
+    required String imagePath,
+  }) async {
+    await _sharedPreferences.setString(
+      SharedPrefsConstants.patientImage,
+      imagePath,
+    );
+  }
+
+  /// Get the user token
+  String getUserImage() {
+    return _sharedPreferences.getString(SharedPrefsConstants.patientImage,).onNull();
+  }
+
   /// Set if the user logged in is true
-  Future<void> setUserLoggedIn() async {
+  Future<void> setIsUserLoggedIn(bool isLoggedIn) async {
     await _sharedPreferences.setBool(
       Constants.isLoggedIn,
-      true,
+      isLoggedIn,
     );
   }
 

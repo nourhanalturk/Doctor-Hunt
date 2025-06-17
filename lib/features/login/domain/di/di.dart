@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tender/config/di/di.dart';
+import 'package:tender/features/home/domain/di/di.dart';
 import 'package:tender/features/login/presentation/controller/login_controller.dart';
+import 'package:tender/features/main_container/domain/di/di.dart';
+import 'package:tender/features/main_home/domain/di/di.dart';
 import 'package:tender/features/out_boarding/domain/di.dart';
 import 'package:tender/features/register/domain/di/di.dart';
 import 'package:tender/features/splash/domain/di.dart';
@@ -47,6 +50,8 @@ initLogin() {
   disposeOutBoarding();
   disposeSplash();
   disposeRegister();
+  disposeMainHome();
+  //disposeMainContainer();
   if (!Get.isRegistered<LoginController>()) {
     Get.put<LoginController>(LoginController());
   }

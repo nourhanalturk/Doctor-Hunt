@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
@@ -8,11 +9,13 @@ import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/core/validator/validator.dart';
+import 'package:tender/features/home/domain/di/di.dart';
 import 'package:tender/features/login/data/request/login_request.dart';
 import 'package:tender/features/login/domain/usecase/login_usecase.dart';
 import '../../../../config/constants/constants.dart';
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/service/email_service.dart';
+import '../../../favorites/domain/di/di.dart';
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -87,15 +90,20 @@ class LoginController extends GetxController {
       password: passwordController.text,
     )
         .then(
-      (value) {
+      (value)async {
+        await initFavorites();
         AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-        prefs.setUserLoggedIn();
-        CacheData.setEmail(value: emailController.text);
+        prefs.setIsUserLoggedIn(true);
         navigateToMain();
         isLoading = 0;
         update();
       },
     ).catchError((error) {
+      dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: error.toString(),
+          title: '');
 
       final errorMessage =
           error is AuthException ? error.message : ManagerStrings.unknown;
@@ -132,7 +140,7 @@ class LoginController extends GetxController {
       },
     ).catchError((error) {
       Get.snackbar(
-        error,
+        error.toString(),
         '',
         duration: const Duration(
           milliseconds: Constants.sessionFinishedDuration,
@@ -151,22 +159,6 @@ class LoginController extends GetxController {
     }
   }
 
-  login() async {
-    LoginUseCase useCase = instance<LoginUseCase>();
-    (await useCase.execute(LoginRequest(
-            email: emailController.text, password: passwordController.text)))
-        .fold(
-      (l) {},
-      (r) {
-        AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-        prefs.setUserLoggedIn();
-        prefs.setToken(token: r.data.token);
-        CacheData.setEmail(value: emailController.text);
-        navigateToMain();
-      },
-    );
-  }
-
   late final EmailService _emailService;
 
   void initEmailService() async {
@@ -180,6 +172,8 @@ class LoginController extends GetxController {
   @override
   void onClose() {
     formKey.currentState!.dispose;
+    emailController.dispose();
+    passwordController.dispose();
     super.onClose();
   }
 

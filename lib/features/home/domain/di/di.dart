@@ -3,11 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'package:tender/features/bookings/domain/di/di.dart';
 import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/doctor_appointment/domain/di/di.dart';
-import 'package:tender/features/favorites/domain/di/di.dart';
 import 'package:tender/features/home/presentation/controller/home_controller.dart';
 import 'package:tender/features/login/domain/di/di.dart';
-import 'package:tender/features/register/domain/di/di.dart';
-import 'package:tender/features/splash/domain/di.dart';
 import '../../../../config/di/di.dart';
 import '../../../main_container/domain/di/di.dart';
 import '../../data/data_source/home_data_remote_data_source.dart';
@@ -51,6 +48,7 @@ initHome() {
   disposeChats();
   disposeBooking();
   disposeDoctorAppointments();
+  disposeLogin();
   if (!Get.isRegistered<HomeController>()) {
     Get.put<HomeController>(HomeController());
   }

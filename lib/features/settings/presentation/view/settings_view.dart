@@ -99,8 +99,10 @@ class SettingsView extends StatelessWidget {
               moreOptions(
                 title: ManagerStrings.textMessages,
                 widget: Switch(
-                  value: true,
-                  onChanged: (value) {},
+                  value: controller.textMessagesValue,
+                  onChanged: (value) {
+                    controller.onTextMessagesValueChanged();
+                  },
                   activeColor: ManagerColors.white,
                   activeTrackColor: ManagerColors.primaryColor,
                 ),
@@ -108,8 +110,10 @@ class SettingsView extends StatelessWidget {
               moreOptions(
                 title: ManagerStrings.phoneCalls,
                 widget: Switch(
-                  value: true,
-                  onChanged: (value) {},
+                  value: controller.phoneCallsValue,
+                  onChanged: (value) {
+                    controller.onPhoneCallsValueChanged();
+                  },
                   activeColor: ManagerColors.white,
                   activeTrackColor: ManagerColors.primaryColor,
                 ),
@@ -117,7 +121,34 @@ class SettingsView extends StatelessWidget {
               moreOptions(
                 title: ManagerStrings.languages,
                 widget: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    showModalBottomSheet(
+                      useSafeArea: true,
+                      backgroundColor: Colors.white,
+                      context: context,
+                      builder: (context) => SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        child: controller.language == ManagerStrings.english ? TextButton(
+                          onPressed: () {
+                            controller.changeLanguage(ManagerStrings.ar);
+                            controller.getLanguage();
+                          },
+                          child: Text(
+                            ManagerStrings.arabic,
+                          ),
+                        ) : TextButton(
+                          onPressed: () {
+                            controller.changeLanguage(ManagerStrings.en);
+                            controller.getLanguage();
+                          },
+                          child: Text(
+                            ManagerStrings.english,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   child: Row(
                     children: [
                       Text(

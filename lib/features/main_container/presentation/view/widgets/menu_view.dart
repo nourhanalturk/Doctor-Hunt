@@ -5,11 +5,14 @@ import 'package:tender/core/resources/manager_colors.dart';
 import 'package:tender/core/resources/manager_font_size.dart';
 import 'package:tender/core/resources/manager_height.dart';
 import 'package:tender/core/resources/manager_icons.dart';
+import 'package:tender/core/resources/manager_images.dart';
 import 'package:tender/core/resources/manager_opacity.dart';
 import 'package:tender/core/resources/manager_radius.dart';
+import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/resources/manager_styles.dart';
 import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/features/main_container/presentation/controller/main_container_controller.dart';
+import 'package:tender/features/main_container/presentation/view/widgets/log_out_dialog.dart';
 import 'package:tender/features/main_container/presentation/view/widgets/menu_item.dart';
 
 class MenuView extends StatelessWidget {
@@ -26,12 +29,14 @@ class MenuView extends StatelessWidget {
             vertical: ManagerWidth.w20,
           ),
           child: Container(
-            child: Column(
+            child: ListView(
               children: [
                 Row(
                   children: [
                     CircleAvatar(
                       radius: ManagerRadius.r25,
+                      backgroundImage: NetworkImage(
+                          'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_items_boosted&w=740'),
                     ),
                     SizedBox(
                       width: ManagerWidth.w15,
@@ -80,11 +85,26 @@ class MenuView extends StatelessWidget {
                           title: model.title,
                           isSelected: index == controller.selectedTapIndex,
                           onTap: model.onTap,
+                          isArrowAppear: true
                           //onTap: model.onTap,
                           );
                     },
                   ),
-                )
+                ),
+                SizedBox(height: ManagerHeight.h20),
+                menuItem(
+                  imagePath: ManagerImages.logout,
+                  title: ManagerStrings.logOut,
+                  onTap: () {
+                    Get.dialog(
+                      logOutDialog(onOkPressed: () {
+                        controller.logOut();
+                      }),
+                    );
+                  },
+                  isSelected: false,
+                  isArrowAppear: false,
+                ),
               ],
             ),
           ),

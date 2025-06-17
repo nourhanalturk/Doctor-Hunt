@@ -209,5 +209,13 @@
   "healthCashbackTnC": "+ 10% Health cashback T&C",
   "healthCheckups": "Health Checkups",
   "noImageAttached": "No Image Attached",
-  "live": "live"
+  "live": "live",
+  "areYouSureToLogOut": "Are you sure you want to logout?",
+  "ok": "Ok",
+  "newFullBodyHealthCheckupsAreAvailable": "Click here to check New Health Checkups Offers !! ",
+  "checkItNow": "Check it now",
+  "myProfile": "My Profile",
+  "doctorHuntAppsPrivacyAndPolicy": "Doctor Hunt Apps Privacy Policy",
+  "appointmentBookedByYou": "Appointment booked by you"
+
 }

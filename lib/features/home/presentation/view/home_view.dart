@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_font_size.dart';
+import 'package:tender/core/resources/manager_font_weight.dart';
 import 'package:tender/core/resources/manager_height.dart';
 import 'package:tender/core/resources/manager_icons.dart';
 import 'package:tender/core/resources/manager_images.dart';
+import 'package:tender/core/resources/manager_json.dart';
 import 'package:tender/core/resources/manager_opacity.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/resources/manager_styles.dart';
@@ -16,9 +19,11 @@ import 'package:tender/core/widgets/categories_container.dart';
 import 'package:tender/core/widgets/content_card.dart';
 import 'package:tender/core/widgets/doctor_info_card.dart';
 import 'package:tender/core/widgets/main_background.dart';
+import 'package:tender/core/widgets/main_button.dart';
 import 'package:tender/features/home/presentation/controller/home_controller.dart';
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/resources/manager_radius.dart';
+import '../../../../core/routes/routes.dart';
 import '../../../../core/widgets/shimmer/home_view_shimmer.dart';
 import '../../domain/model/categories_model.dart';
 
@@ -39,7 +44,8 @@ class HomeView extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () => controller.homeRequest(),
           child: AppScaffold(
-            body: ListView(
+            body: controller.popularDoctors.isEmpty  ? CircularProgressIndicator(): ListView(
+
               children: [
                 Stack(
                   clipBehavior: Clip.none,
@@ -71,7 +77,7 @@ class HomeView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${ManagerStrings.hi} ${CacheData.getUserName().onNull()}',
+                                  '${ManagerStrings.hi} ${controller.userName}',
                                   style: getRegularTextStyle(
                                     fontSize: ManagerFontSize.s20,
                                     color: ManagerColors.white,
@@ -90,6 +96,9 @@ class HomeView extends StatelessWidget {
                               alignment: Alignment.topCenter,
                               child: CircleAvatar(
                                 radius: ManagerRadius.r30,
+                                backgroundImage: NetworkImage(
+                                  controller.userImage,
+                                ),
                               ),
                             )
                           ],
@@ -112,7 +121,7 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                           child: TextFormField(
-                            controller: TextEditingController(),
+                            controller: controller.searchController,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               prefixIcon: Icon(
@@ -139,7 +148,66 @@ class HomeView extends StatelessWidget {
                   ],
                 ),
                 SizedBox(
-                  height: size.height * ManagerOpacity.op0_07,
+                  height: size.height * ManagerOpacity.op0_09,
+                ),
+                InkWell(
+                    onTap: () {
+                      Get.toNamed(Routes.healthCheckups);
+                    },
+                    child: // Replace this problematic section:
+                        Center(
+                      child: Container(
+                        height: size.height * 0.09,
+                        width: size.width * 0.7,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              height: size.height * 0.08,
+                              width: size.width * 0.7,
+                              decoration: BoxDecoration(
+                                color: ManagerColors.white,
+                                borderRadius:
+                                    BorderRadius.circular(ManagerRadius.r20),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(ManagerWidth.w15),
+                                child: Text(
+                                  ManagerStrings
+                                      .newFullBodyHealthCheckupsAreAvailable,
+                                  style: TextStyle(
+                                    fontSize: ManagerFontSize.s14,
+                                    color: ManagerColors.black,
+                                    fontWeight: ManagerFontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            // Fixed Positioned widget:
+                            Positioned(
+                              top: -28,
+                              left: (size.width * 0.7) / 2 - 25,
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: const BoxDecoration(
+                                  color: ManagerColors.scaffoldColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Lottie.asset(
+                                  ManagerJson.readMore,
+                                  fit: BoxFit.cover,
+                                  repeat: true,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                SizedBox(
+                  height: size.height * ManagerOpacity.op0_01,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -158,71 +226,80 @@ class HomeView extends StatelessWidget {
                   padding: EdgeInsets.symmetric(
                     horizontal: ManagerWidth.w20,
                   ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      height: size.height * ManagerOpacity.op0_25,
-                      width: size.width * ManagerOpacity.op0_33,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                          ManagerRadius.r20,
-                        ),
-                        child: Stack(
-                          children: [
-                            Image.asset(
-                              ManagerImages.liveDoctorImage,
-                            ),
-                            Container(
-                              height: size.height * ManagerOpacity.op0_25,
-                              width: size.width * ManagerOpacity.op0_33,
-                              decoration: BoxDecoration(
-                                  color: ManagerColors.white
-                                      .withOpacity(ManagerOpacity.op0_3)),
-                            ),
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
+                  child: GestureDetector(
+                    onTap: () {
+                      controller.testNowReminder();
+                    },
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        height: size.height * ManagerOpacity.op0_25,
+                        width: size.width * ManagerOpacity.op0_33,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            ManagerRadius.r20,
+                          ),
+                          child: Stack(
+                            children: [
+                              Image.asset(
+                                ManagerImages.liveDoctorImage,
+                              ),
+                              Container(
+                                height: size.height * ManagerOpacity.op0_25,
+                                width: size.width * ManagerOpacity.op0_33,
+                                decoration: BoxDecoration(
+                                    color: ManagerColors.white
+                                        .withOpacity(ManagerOpacity.op0_3)),
+                              ),
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
                                       left: size.width * ManagerOpacity.op0_19,
-                                      top: ManagerHeight.h9,),
-                                  child: Container(
-                                    height: size.height * ManagerOpacity.op0_03,
-                                    width: size.width * ManagerOpacity.op0_12,
-                                    decoration: BoxDecoration(
-                                      color: ManagerColors.redColor,
-                                      borderRadius: BorderRadius.circular(
-                                        ManagerRadius.r4,
+                                      top: ManagerHeight.h9,
+                                    ),
+                                    child: Container(
+                                      height:
+                                          size.height * ManagerOpacity.op0_03,
+                                      width: size.width * ManagerOpacity.op0_12,
+                                      decoration: BoxDecoration(
+                                        color: ManagerColors.redColor,
+                                        borderRadius: BorderRadius.circular(
+                                          ManagerRadius.r4,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: size.height *
+                                                ManagerOpacity.op0_01,
+                                            width: size.width *
+                                                ManagerOpacity.op0_05,
+                                            decoration: const BoxDecoration(
+                                                color: ManagerColors.white,
+                                                shape: BoxShape.circle),
+                                          ),
+                                          Text(
+                                            ManagerStrings.live,
+                                            style: TextStyle(
+                                              fontSize: ManagerFontSize.s13,
+                                              color: ManagerColors.white,
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          height: size.height *
-                                              ManagerOpacity.op0_01,
-                                          width: size.width *
-                                              ManagerOpacity.op0_05,
-                                          decoration: const BoxDecoration(
-                                              color: ManagerColors.white,
-                                              shape: BoxShape.circle),
-                                        ),
-                                        Text(
-                                          ManagerStrings.live,
-                                          style: TextStyle(
-                                            fontSize: ManagerFontSize.s13,
-                                            color: ManagerColors.white,
-                                          ),
-                                        )
-                                      ],
-                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: size.height*ManagerOpacity.op0_07,
-                                ),
-                                SvgPicture.asset(ManagerImages.playIcon,)
-                              ],
-                            )
-                          ],
+                                  SizedBox(
+                                    height: size.height * ManagerOpacity.op0_07,
+                                  ),
+                                  SvgPicture.asset(
+                                    ManagerImages.playIcon,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

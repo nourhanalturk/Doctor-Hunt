@@ -350,7 +350,7 @@ class DoctorAppointmentView extends StatelessWidget {
                                         return InkWell(
                                           onTap: () {
                                             controller
-                                                .onReminderTimesPressed(index);
+                                                .onReminderTimesPressed(index ,controller.appointmentTime);
                                           },
                                           child: Container(
                                             height: size.height *

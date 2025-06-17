@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:tender/features/main_container/domain/di/di.dart';
 import 'package:tender/features/main_home/presentation/controller/main_home_controller.dart';
 import 'package:tender/features/out_boarding/domain/di.dart';
 import '../../../doctor_appointment/domain/di/di.dart';

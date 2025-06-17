@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorKey: Get.key,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       debugShowCheckedModeBanner: dotenv.env[EnvConstants.debug].onNullBool(),

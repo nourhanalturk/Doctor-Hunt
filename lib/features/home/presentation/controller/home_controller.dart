@@ -2,24 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tender/config/constants/constants.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/resources/manager_colors.dart';
 import 'package:tender/core/resources/manager_images.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
+import 'package:tender/core/service/notifications_service.dart';
+import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/home/domain/usecase/home_usecase.dart';
 import '../../../../core/enums/section_enum.dart';
 import '../../../../core/error_handler/failure.dart';
 import '../../../../core/error_handler/server_failure.dart';
 import '../../domain/model/categories_model.dart';
 import '../../domain/model/home_data_model.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class HomeController extends GetxController {
   TextEditingController searchController = TextEditingController();
-
-
+  String userName = '';
+  String userImage = '';
 
   onSearchButtonClearPressed() {
     searchController.text = '';
@@ -53,15 +59,15 @@ class HomeController extends GetxController {
   ];
   List<HomeModel> homeSections = [];
   String errorMessage = '';
-  bool isLoading = true ;
+  bool isLoading = true;
 
   homeRequest() async {
-    isLoading = true ;
+    isLoading = true;
     update();
     HomeUsecase useCase = instance<HomeUsecase>();
     (await useCase.execute()).fold(
       (l) async {
-        isLoading =false ;
+        isLoading = false;
         update();
         if (l.message.contains(ManagerStrings.authException) ||
             l.message.contains(ManagerStrings.refreshFailed) ||
@@ -87,7 +93,7 @@ class HomeController extends GetxController {
         homeSections.clear();
       },
       (sections) {
-        isLoading =false ;
+        isLoading = false;
         filterSections(sections);
         update();
       },
@@ -124,11 +130,41 @@ class HomeController extends GetxController {
     CacheData.setDoctorDetailsId(value: id);
     Get.toNamed(Routes.doctorDetails);
   }
+  void testNowReminder() async {
+    await NotiService().initNotification();
+
+    DateTime now = DateTime.now();
+    DateTime scheduledTime = now.add(Duration(minutes: 1));
+
+    print('🕒 Current: $now');
+    print('🔔 Scheduled for: $scheduledTime');
+
+    await NotiService().notificationsPlugin.zonedSchedule(
+      999,
+      '💊 Reminder',
+      'You have an appointment test!',
+      tz.TZDateTime.from(scheduledTime, tz.local),
+      NotiService().notificationDetails(),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle, // ✅
+    );
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
+  }
+
+
 
 
   @override
   void onInit() {
-    homeRequest();
     super.onInit();
+
+    homeRequest();
+    AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
+    userName = prefs.getPatientName() ?? '';
+    userImage = Constants.defaultImageUrl; // prefs.getUserImage();
   }
 }

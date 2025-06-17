@@ -2,9 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
+import 'package:tender/core/resources/manager_images.dart';
+import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/core/widgets/chat_container.dart';
 import 'package:tender/core/widgets/main_background.dart';
 import 'package:tender/features/chat/presentation/controller/chats_controller.dart';
@@ -35,28 +38,40 @@ class ChatsView extends StatelessWidget {
                 height: size.height * ManagerOpacity.op0_15,
                 width: size.width * ManagerOpacity.op0_9,
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFF0EBE7F),
-                        Color(0xFF0EC8A6),
-                        ManagerColors.white.withOpacity(0.2),
-                        Color(0xFF0EC8A6),
-                        Color(0xFF0ED6C9),
-                      ],
-                      stops: [0.0, 0.4, 0.45, 0.6, 1.0],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      transform: GradientRotation(pi / 6),
+                  gradient: LinearGradient(colors: [
+                    ManagerColors.white,
+                    ManagerColors.primaryColor
+                        .withOpacity(ManagerOpacity.op0_5),
+                  ]),
+                  borderRadius: BorderRadius.circular(
+                    ManagerRadius.r12,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SvgPicture.asset(
+                        ManagerImages.logo,
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(ManagerRadius.r12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                        offset: Offset(0, 4),
-                      )
-                    ]),
+                    SizedBox(
+                      width: ManagerWidth.w10,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: ManagerHeight.h10,
+                      ),
+                      child: Text(
+                        ManagerStrings.chats,
+                        style: getBoldTextStyle(
+                          fontSize: ManagerFontSize.s30,
+                          color: ManagerColors.primaryColor,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
               SizedBox(
                 height: size.height * ManagerOpacity.op0_05,
@@ -68,15 +83,15 @@ class ChatsView extends StatelessWidget {
                         itemBuilder: (context, index) => shimmerChatItem(),
                       )
                     : ListView.builder(
-                        itemCount: controller.allChats.length,
+                        itemCount: controller.combinedChats.length,
                         itemBuilder: (context, index) {
-                          var model = controller.data[index];
+                          var model = controller.combinedChats[index].doctor;
                           return chatsContainer(
                             imagePath: model.image.onNull(),
                             doctorName: model.doctorName.onNull(),
                             onTap: () {
                               controller.navigateToMessages(
-                                controller.allChats[index].chatId.onNull(),
+                                controller.combinedChats[index].chat.chatId.onNull(),
                                 model.doctorName.onNull(),
                               );
                             },
