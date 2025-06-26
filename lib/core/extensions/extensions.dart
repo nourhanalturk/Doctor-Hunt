@@ -1,3 +1,5 @@
+import '../../config/constants/constants.dart';
+
 /// Non Null String to handle the null safety for string
 extension NonNullString on String? {
   String onNull() {
@@ -114,5 +116,14 @@ extension OnNullBool on String? {
     } else {
       return bool.parse(this!);
     }
+  }
+}
+
+extension OnNullImage on String? {
+  String onNullImage() {
+    if (this == null || this!.isEmpty || !this!.startsWith('http')) {
+      return Constants.defaultImageUrl;
+    }
+    return this!;
   }
 }

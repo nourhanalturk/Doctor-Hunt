@@ -32,6 +32,7 @@ class BookingsController extends GetxController {
         isLoading =false ;
         update();
         userBookingsAppointments = r;
+        print(userBookingsAppointments);
 
         update();
       },
@@ -58,8 +59,7 @@ class BookingsController extends GetxController {
         .single()
         .then(
       (value) {
-        doctorName = value.toString();
-        print(doctorName);
+        doctorName = value[SupabaseFieldsConstants.name];
         update();
       },
     ).catchError((e) {});

@@ -30,5 +30,13 @@ class SupabaseFieldsConstants {
   static const String chatId = 'chat_id';
   static const String lastMessage = 'last_message';
   static const String image = 'image';
+  static const String dateOfBirth = 'date_of_birth';
+  static const String location = 'location';
+  static const String imageUrl = 'image_url';
+  static const String fullName = 'full_name';
+  static const String profileImageUrl = 'profile_image_url';
+
+
+
 
 }

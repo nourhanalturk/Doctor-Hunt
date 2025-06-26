@@ -36,8 +36,8 @@ class MenuView extends StatelessWidget {
                     CircleAvatar(
                       radius: ManagerRadius.r25,
                       backgroundImage: NetworkImage(
-                          'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_items_boosted&w=740'),
-                    ),
+                        controller.userImage,
+                    ),),
                     SizedBox(
                       width: ManagerWidth.w15,
                     ),

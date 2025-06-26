@@ -92,12 +92,18 @@ class HomeView extends StatelessWidget {
                                 )
                               ],
                             ),
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: CircleAvatar(
-                                radius: ManagerRadius.r30,
-                                backgroundImage: NetworkImage(
-                                  controller.userImage,
+                            InkWell(
+                              onTap: () {
+                                controller.navigateToProfileInfo();
+
+                              },
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: CircleAvatar(
+                                  radius: ManagerRadius.r30,
+                                  backgroundImage: NetworkImage(
+                                    controller.userImage,
+                                  ),
                                 ),
                               ),
                             )

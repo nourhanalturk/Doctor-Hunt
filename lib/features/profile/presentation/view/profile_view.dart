@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:tender/core/extensions/extensions.dart';
+import 'package:tender/core/resources/manager_icon_size.dart';
 import 'package:tender/core/resources/manager_icons.dart';
 import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/core/widgets/custom_app_bar.dart';
 import 'package:tender/core/widgets/main_background.dart';
 import 'package:tender/core/widgets/main_button.dart';
 import 'package:tender/core/widgets/profile_textField.dart';
-import 'package:tender/core/widgets/text_field.dart';
 import 'package:tender/features/profile/presentation/controller/profile_controller.dart';
-import '../../../../core/cache/app_cache.dart';
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/resources/manager_font_size.dart';
 import '../../../../core/resources/manager_height.dart';
@@ -76,8 +74,29 @@ class ProfileView extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      CircleAvatar(
-                        radius: ManagerRadius.r80,
+                      InkWell(
+                        onTap: () {
+                          controller.pickImage();
+
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+
+                            CircleAvatar(
+                              radius: ManagerRadius.r80,
+                              backgroundImage: NetworkImage(
+                                controller.imageUrl,
+                              ),
+                            ),
+                            CircleAvatar(
+                              radius: ManagerRadius.r80,
+                              backgroundColor: ManagerColors.white.withOpacity(ManagerOpacity.op0_6),
+
+                            ),
+                            Icon(ManagerIcons.edit ,color: ManagerColors.redColor, size: ManagerIconSize.s30,)
+                          ],
+                        ),
                       ),
                     ],
                   )),
@@ -114,16 +133,16 @@ class ProfileView extends StatelessWidget {
                     height: size.height * ManagerOpacity.op0_01,
                   ),
                   profileTextField(
-                      labelText: ManagerStrings.dateOfBirth,
-                      controller: controller.dateOfBirthController,
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          controller.selectDate(context);
-                        },
-                        icon: Icon(
-                          ManagerIcons.edit,
-                        ),
+                    labelText: ManagerStrings.dateOfBirth,
+                    controller: controller.dateOfBirthController,
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        controller.selectDate(context);
+                      },
+                      icon: Icon(
+                        ManagerIcons.edit,
                       ),
+                    ),
                   ),
                   SizedBox(
                     height: size.height * ManagerOpacity.op0_01,
@@ -136,7 +155,9 @@ class ProfileView extends StatelessWidget {
                     height: size.height * ManagerOpacity.op0_02,
                   ),
                   mainButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.profileRequest();
+                    },
                     buttonText: ManagerStrings.keepGoing,
                   ),
                 ],

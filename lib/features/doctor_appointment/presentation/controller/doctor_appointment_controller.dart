@@ -112,13 +112,16 @@ class DoctorAppointmentController extends GetxController {
     }
 
 
+
     initAddAppointmentRequest();
     AddAppointmentUseCase useCase = instance<AddAppointmentUseCase>();
     AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
+    final patientUid = supabase.auth.currentUser!.id;
+
 
     (await useCase.execute(AddAppointmentRequest(
       doctorId: doctorId,
-      patientId: prefs.getPatientUid(),
+      patientId: patientUid,
       appointmentTime: appointmentTime,
       contactNumber: contactNumber.text,
       dependentName: patientName.text,

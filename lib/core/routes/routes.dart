@@ -23,6 +23,8 @@ import 'package:tender/features/privacy_and_policy/domain/di/di.dart';
 import 'package:tender/features/privacy_and_policy/presentation/view/privacy_and_policy_view.dart';
 import 'package:tender/features/profile/domain/di/di.dart';
 import 'package:tender/features/profile/presentation/view/profile_view.dart';
+import 'package:tender/features/profile_records_info/domain/di/di.dart';
+import 'package:tender/features/profile_records_info/presentation/view/profile_records_info_view.dart';
 import 'package:tender/features/register/domain/di/di.dart';
 import 'package:tender/features/register/presentation/view/register_view.dart';
 import 'package:tender/features/settings/domain/di/di.dart';
@@ -65,6 +67,7 @@ class Routes {
   static const String healthCheckups = '/healthCheckups';
   static const String myDoctors = '/myDoctors';
   static const String privacyAndPolicy = '/privacyAndPolicy';
+  static const String profileRecordsInfo = '/profileRecordsInfo';
 
 }
 
@@ -175,6 +178,11 @@ class RouteGenerator {
         initPrivacy();
         return MaterialPageRoute(
           builder: (context) => const PrivacyAndPolicyView(),
+        );
+      case Routes.profileRecordsInfo:
+        initProfileRecordsInfo();
+        return MaterialPageRoute(
+          builder: (context) => const ProfileRecordsInfoView(),
         );
       default:
         return unDefinedRoute();

@@ -11,10 +11,13 @@ import '../../../../../core/resources/manager_styles.dart';
 import '../../../../../core/resources/manager_width.dart';
 import '../../../../../core/widgets/main_button.dart';
 
-Widget appointmentDetailsDialog({
+Widget recordDetailsDialog({
+  required String diseaseName,
+  required String description,
   required String doctorName,
-  required String contactNumber,
-  required dynamic Function()? onPressed,
+  required  reportDate,
+  required String medicineNames,
+  required String recordFor,
   String? imagePath,
 }) {
   var size = MediaQuery.of(Get.context!).size;
@@ -24,49 +27,27 @@ Widget appointmentDetailsDialog({
       ),
       backgroundColor: ManagerColors.white,
       child: SizedBox(
-        height: size.height * ManagerOpacity.op0_54,
-        width: size.width * 1.0,
+        height: size.height * ManagerOpacity.op0_7,
+        width: size.width * ManagerOpacity.op0_7,
         child: Padding(
           padding: EdgeInsets.all(
             ManagerWidth.w20,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: size.width * ManagerOpacity.op0_5,
-                height: size.height * ManagerOpacity.op0_2,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: ManagerColors.primaryColor
-                      .withOpacity(ManagerOpacity.op0_2),
+              Text(
+                '${ManagerStrings.diseaseName}  \n $diseaseName',
+                style: getBoldTextStyle(
+                  fontSize: ManagerFontSize.s30,
+                  color: ManagerColors.black,
                 ),
-                child: Padding(
-                  padding: EdgeInsets.all(
-                    ManagerWidth.w10,
-                  ),
-                  child: imagePath != ''
-                      ? CircleAvatar(
-                          radius: ManagerRadius.r30,
-                          backgroundImage:NetworkImage(imagePath.onNull())
-                        )
-                      : Center(
-                          child: Text(
-                            ManagerStrings.noImageAttached,
-                            style: getMediumTextStyle(
-                              fontSize: ManagerFontSize.s19,
-                              color: ManagerColors.white,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                ),
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_02,
+                textAlign: TextAlign.center,
               ),
               Text(
-                '${ManagerStrings.doctorName} is \n $doctorName',
+                '${ManagerStrings.doctorName}  \n $doctorName',
                 style: getBoldTextStyle(
                   fontSize: ManagerFontSize.s30,
                   color: ManagerColors.black,
@@ -77,7 +58,19 @@ Widget appointmentDetailsDialog({
                 height: size.height * ManagerOpacity.op0_01,
               ),
               Text(
-                '${ManagerStrings.contactNumber} is $contactNumber',
+                '${ManagerStrings.description} \n $description',
+                style: getRegularTextStyle(
+                  fontSize: ManagerFontSize.s16,
+                  color: ManagerColors.blueBell,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(
+                height: size.height * ManagerOpacity.op0_02,
+              ),
+              Text(
+                '${ManagerStrings.medicineNames} \n $medicineNames',
                 style: getRegularTextStyle(
                   fontSize: ManagerFontSize.s16,
                   color: ManagerColors.blueBell,
@@ -86,15 +79,22 @@ Widget appointmentDetailsDialog({
               SizedBox(
                 height: size.height * ManagerOpacity.op0_02,
               ),
+              Text(
+                '${ManagerStrings.recordFor} \n $recordFor',
+                style: getRegularTextStyle(
+                  fontSize: ManagerFontSize.s16,
+                  color: ManagerColors.blueBell,
+                ),
+              ),
               SizedBox(
                 height: size.height * ManagerOpacity.op0_02,
               ),
-              mainButton(
-                onPressed: onPressed,
-                buttonText: ManagerStrings.done,
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_02,
+              Text(
+                '${ManagerStrings.reportDate} \n $reportDate',
+                style: getRegularTextStyle(
+                  fontSize: ManagerFontSize.s16,
+                  color: ManagerColors.blueBell,
+                ),
               ),
             ],
           ),

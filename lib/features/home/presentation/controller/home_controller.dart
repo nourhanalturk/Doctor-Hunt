@@ -17,6 +17,7 @@ import 'package:tender/features/home/domain/usecase/home_usecase.dart';
 import '../../../../core/enums/section_enum.dart';
 import '../../../../core/error_handler/failure.dart';
 import '../../../../core/error_handler/server_failure.dart';
+import '../../../doctor_details/domain/di/di.dart';
 import '../../domain/model/categories_model.dart';
 import '../../domain/model/home_data_model.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,6 +25,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 class HomeController extends GetxController {
   TextEditingController searchController = TextEditingController();
+  AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
   String userName = '';
   String userImage = '';
 
@@ -62,6 +64,7 @@ class HomeController extends GetxController {
   bool isLoading = true;
 
   homeRequest() async {
+    refreshUserImage();
     isLoading = true;
     update();
     HomeUsecase useCase = instance<HomeUsecase>();
@@ -125,8 +128,13 @@ class HomeController extends GetxController {
       return '${ManagerStrings.unexpectedError}: ${failure.message}';
     }
   }
+  navigateToProfileInfo (){
+    Get.toNamed(Routes.profileRecordsInfo);
+  }
 
-  navigateToDoctorDetails(int id) {
+  navigateToDoctorDetails(int id)async {
+    await disposeDoctorDetails();
+
     CacheData.setDoctorDetailsId(value: id);
     Get.toNamed(Routes.doctorDetails);
   }
@@ -154,6 +162,10 @@ class HomeController extends GetxController {
     searchController.dispose();
     super.onClose();
   }
+  refreshUserImage(){
+    userImage =  prefs.getUserImage();
+    update();
+  }
 
 
 
@@ -163,8 +175,7 @@ class HomeController extends GetxController {
     super.onInit();
 
     homeRequest();
-    AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
     userName = prefs.getPatientName() ?? '';
-    userImage = Constants.defaultImageUrl; // prefs.getUserImage();
+    userImage =  prefs.getUserImage();
   }
 }

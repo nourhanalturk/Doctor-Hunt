@@ -37,9 +37,8 @@ class AppSettingsPrefs {
     );
   }
 
-  /// Get the user token
   String getUserImage() {
-    return _sharedPreferences.getString(SharedPrefsConstants.patientImage,).onNull();
+    return _sharedPreferences.getString(SharedPrefsConstants.patientImage,).onNullImage();
   }
 
   /// Set if the user logged in is true

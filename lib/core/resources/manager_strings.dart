@@ -470,6 +470,10 @@ class ManagerStrings {
   static String get checkItNow => tr('checkItNow');
   static String get myProfile => tr('myProfile');
   static String get doctorHuntAppsPrivacyAndPolicy => tr('doctorHuntAppsPrivacyAndPolicy');
+  static String get updatedSuccessfully => tr('updatedSuccessfully');
+  static String get hereWhereYouCanSeeAllYourBookingAppointments => tr('hereWhereYouCanSeeAllYourBookingAppointments');
+  static String get profileInfo => tr('profileInfo');
+  static String get patientRecords => tr('patientRecords');
 
 
 

@@ -216,6 +216,10 @@
   "checkItNow": "Check it now",
   "myProfile": "My Profile",
   "doctorHuntAppsPrivacyAndPolicy": "Doctor Hunt Apps Privacy Policy",
-  "appointmentBookedByYou": "Appointment booked by you"
+  "appointmentBookedByYou": "Appointment booked by you",
+  "updatedSuccessfully": "Updated Successfully :)",
+  "hereWhereYouCanSeeAllYourBookingAppointments": "Here Where You Can See All Your Booking Appointments",
+  "doctorName": "Doctor Name",
+  "profileInfo": "Profile Information"
 
 }

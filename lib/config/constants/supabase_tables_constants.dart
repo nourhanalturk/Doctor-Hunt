@@ -7,5 +7,5 @@ class SupabaseTableConstants {
   static const favorites = 'favorites';
   static const medicalRecords = 'medical_records';
   static const records = 'records';
-
+  static const String profile = 'profile';
 }

@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: dotenv.env[EnvConstants.debug].onNullBool(),
       locale: localeSettings.defaultLocale,
       onGenerateRoute: RouteGenerator.getRoute,
-      initialRoute: Routes.mainHome,
+      initialRoute: Routes.splash,
     );
   }
 }
