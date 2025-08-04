@@ -8,6 +8,11 @@ import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/main_container/domain/model/menu_item_model.dart';
 
+import '../../../home/domain/di/di.dart';
+import '../../../login/domain/di/di.dart';
+import '../../../login/presentation/controller/login_controller.dart';
+import '../../domain/di/di.dart';
+
 class MainContainerController extends GetxController
     with GetSingleTickerProviderStateMixin {
   late AnimationController animationController;
@@ -111,16 +116,20 @@ class MainContainerController extends GetxController
     }
   }
 
-  logOut() async {
+  Future<void> logOut() async {
     AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
     prefs.setIsUserLoggedIn(false);
-    Get.toNamed(Routes.login);
+
     await Supabase.instance.client.auth.signOut();
+    await Get.delete<LoginController>(force: true);
+    Get.toNamed(Routes.login);
   }
 
   @override
-  void onClose() {
+  void dispose() {
     animationController.dispose();
-    super.onClose();
+    super.dispose();
   }
+
+
 }

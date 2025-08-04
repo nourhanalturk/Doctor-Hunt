@@ -18,6 +18,8 @@ class LoginView extends StatelessWidget {
 
     return AppScaffold(
       body: GetBuilder<LoginController>(
+        init: LoginController(),
+        autoRemove: true,
         builder: (controller) {
           var size = MediaQuery.of(context).size;
           return authView(

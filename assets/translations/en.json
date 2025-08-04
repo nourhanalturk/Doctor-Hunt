@@ -220,6 +220,14 @@
   "updatedSuccessfully": "Updated Successfully :)",
   "hereWhereYouCanSeeAllYourBookingAppointments": "Here Where You Can See All Your Booking Appointments",
   "doctorName": "Doctor Name",
-  "profileInfo": "Profile Information"
-
+  "profileInfo": "Profile Information",
+  "chatWithYourDoctorsHere": "Chat With Your Doctors ",
+  "myAppointments": "My Appointments",
+  "noAppointmentsYet": "No appointments yet",
+  "bookYourFirstAppointment": "Book your first appointment",
+  "findDoctors": "Find doctors",
+  "upcomingAppointments": "Upcoming Appointments",
+  "viewDetails": "View Details",
+  "noChatsYet": "No Chats Yet",
+  "myChats": "My Chats"
 }

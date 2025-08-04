@@ -44,7 +44,7 @@ class HomeView extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () => controller.homeRequest(),
           child: AppScaffold(
-            body: controller.popularDoctors.isEmpty  ? CircularProgressIndicator(): ListView(
+            body: controller.popularDoctors.isEmpty  ? const Center(child: CircularProgressIndicator(color: ManagerColors.primaryColor,)): ListView(
 
               children: [
                 Stack(
@@ -127,7 +127,6 @@ class HomeView extends StatelessWidget {
                             ),
                           ),
                           child: TextFormField(
-                            controller: controller.searchController,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               prefixIcon: Icon(
@@ -160,7 +159,7 @@ class HomeView extends StatelessWidget {
                     onTap: () {
                       Get.toNamed(Routes.healthCheckups);
                     },
-                    child: // Replace this problematic section:
+                    child:
                         Center(
                       child: Container(
                         height: size.height * 0.09,

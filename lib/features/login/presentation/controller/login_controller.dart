@@ -25,7 +25,9 @@ class LoginController extends GetxController {
   TextEditingController confirmResetPasswordController =
       TextEditingController();
 
-  var formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  get formKey => _formKey;
   FieldValidator validator = FieldValidator();
 
   PageController pageController = PageController();
@@ -90,7 +92,7 @@ class LoginController extends GetxController {
       password: passwordController.text,
     )
         .then(
-      (value)async {
+      (value) async {
         await initFavorites();
         AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
         prefs.setIsUserLoggedIn(true);
@@ -150,7 +152,7 @@ class LoginController extends GetxController {
   }
 
   navigateToMain() {
-    Get.toNamed(Routes.mainHome);
+    Get.offAllNamed(Routes.mainHome);
   }
 
   performLogin() {
@@ -170,16 +172,25 @@ class LoginController extends GetxController {
   }
 
   @override
-  void onClose() {
-    formKey.currentState!.dispose;
-    emailController.dispose();
-    passwordController.dispose();
-    super.onClose();
+  void onInit() {
+    super.onInit();
+    pageController = PageController();
+    initEmailService();
   }
 
   @override
-  void onInit() {
-    initEmailService();
-    super.onInit();
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    forgotPasswordEmailController.dispose();
+    resetPasswordController.dispose();
+    confirmResetPasswordController.dispose();
+    pageController.dispose();
+    passwordFocusNode.dispose();
+    resetPasswordFocusNode.dispose();
+    confirmPasswordFocusNode.dispose();
+    super.dispose();
   }
+
+
 }

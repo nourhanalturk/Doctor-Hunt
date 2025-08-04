@@ -337,7 +337,7 @@ class DoctorAppointmentView extends StatelessWidget {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: size.height * ManagerOpacity.op0_13,
+                                    height: size.height * ManagerOpacity.op0_05,
                                     child: ListView.separated(
                                       scrollDirection: Axis.horizontal,
                                       itemCount:
@@ -372,7 +372,7 @@ class DoctorAppointmentView extends StatelessWidget {
                                               child: Text(
                                                 '${controller.reminderTimes[index]}\n${ManagerStrings.minit}',
                                                 style: getMediumTextStyle(
-                                                  fontSize: ManagerFontSize.s14,
+                                                  fontSize: ManagerFontSize.s11,
                                                   color: controller
                                                               .reminderTimeIndex ==
                                                           index
@@ -387,9 +387,9 @@ class DoctorAppointmentView extends StatelessWidget {
                                       },
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: size.height * ManagerOpacity.op0_01,
-                                  ),
+                                  // SizedBox(
+                                  //   height: size.height * ManagerOpacity.op0_01,
+                                  // ),
                                   mainButton(
                                     onPressed: () {
                                       controller.addAppointment();

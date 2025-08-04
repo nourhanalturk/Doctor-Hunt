@@ -46,12 +46,9 @@ disposeHomeRequest() {
 
 initHome() {
   initHomeRequest();
-  initMainContainer();
   disposeChats();
   disposeBooking();
   disposeDoctorAppointments();
-  disposeLogin();
-  disposeProfile();
   disposeProfileRecordsInfo();
   if (!Get.isRegistered<HomeController>()) {
     Get.put<HomeController>(HomeController());

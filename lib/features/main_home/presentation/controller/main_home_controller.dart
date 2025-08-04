@@ -63,7 +63,6 @@ class MainHomeController extends GetxController {
       case 0:
         {
           initHome();
-
         }
       case 1:
         initFavorites();

@@ -20,7 +20,6 @@ class MainHomeView extends StatelessWidget {
         return AppScaffold(
           bottomNavigationBar: controller.currentBottomNavIndex==0 ? GetBuilder<MainContainerController>(
             builder: (mainController) {
-              print("Bottom nav visibility: ${mainController.isBottomNavShown}");
 
               return mainController.isBottomNavShown
                   ? buildBottomNavContainer(controller, size)

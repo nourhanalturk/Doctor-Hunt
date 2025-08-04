@@ -46,14 +46,15 @@ disposeLoginRequest() {
 }
 
 initLogin() {
+  print("initLogin called");
   initLoginRequest();
   disposeOutBoarding();
   disposeSplash();
   disposeRegister();
   disposeMainHome();
-  //disposeMainContainer();
+  // disposeMainContainer();
   if (!Get.isRegistered<LoginController>()) {
-    Get.put<LoginController>(LoginController());
+    Get.put(LoginController());
   }
 }
 

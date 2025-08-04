@@ -122,10 +122,20 @@ class MedicalRecordsController extends GetxController {
       }).then(
         (value) {
           Get.snackbar(ManagerStrings.done, ManagerStrings.yourRecordSuccessfullyAdded);
+          Get.toNamed(Routes.mainHome);
           print('added');
         },
-      );
+      ).catchError((e) {
+        print(e);
+        dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: '${ManagerStrings.failed} $e',
+          title: '',
+        );
+      });
     } else {
+
       dialogRender(
           context: Get.context!,
           stateRenderType: StateRenderType.popUpErrorState,

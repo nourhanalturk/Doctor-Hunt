@@ -7,6 +7,9 @@ class ManagerStrings {
 
   static String get success => tr('success');
   static String get ok => tr('ok');
+  static String get myChats => tr('myChats');
+  static String get noChatsYet => tr('noChatsYet');
+
 
 
   static String get skip => tr('skip');
@@ -474,6 +477,16 @@ class ManagerStrings {
   static String get hereWhereYouCanSeeAllYourBookingAppointments => tr('hereWhereYouCanSeeAllYourBookingAppointments');
   static String get profileInfo => tr('profileInfo');
   static String get patientRecords => tr('patientRecords');
+  static String get chatWithYourDoctorsHere => tr('chatWithYourDoctorsHere');
+  static String get myAppointments => tr('myAppointments');
+
+  static String get noAppointmentsYet => tr('noAppointmentsYet');
+  static String get bookYourFirstAppointment => tr('bookYourFirstAppointment');
+  static String get findDoctors => tr('findDoctors');
+  static String get upcomingAppointments => tr('upcomingAppointments');
+  static String get viewDetails => tr('viewDetails');
+
+
 
 
 
