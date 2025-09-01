@@ -25,7 +25,7 @@ initModule() async {
   await dotenv.load(fileName: '.env');
 
   final SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
-  // sharedPrefs.clear();
+  sharedPrefs.clear();
 
   await Supabase.initialize(
     url: Constants.supaBaseUrl,

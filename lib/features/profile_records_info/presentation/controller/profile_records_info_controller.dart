@@ -28,9 +28,12 @@ class ProfileRecordsInfoController extends GetxController {
     });
   }
 
+  bool isRecordLoading = true;
   List<PatientRecordsModel> records = [];
 
   getPatientRecords() async {
+    isRecordLoading = true;
+    update();
     await supabase
         .from(SupabaseTableConstants.medicalRecords)
         .select( )
@@ -43,8 +46,12 @@ class ProfileRecordsInfoController extends GetxController {
             )
             .toList();
         print(records);
+        isRecordLoading = false;
+        update();
       },
     ).catchError((error) {
+      isRecordLoading = true;
+      update();
       print(error);
     });
   }
