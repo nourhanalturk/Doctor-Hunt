@@ -22,38 +22,60 @@ class ErrorHandler implements Exception {
       final statusCode = response?.statusCode ?? ResponseCode.badRequest;
       final data = response?.data;
 
-      if (response?.statusCode == ResponseCode.unAuthorized) {
+      if (statusCode == ResponseCode.unAuthorized) {
         Future.delayed(
-          const Duration(
-            seconds: Constants.sessionFinishedDuration,
-          ),
-          () {
+          const Duration(seconds: Constants.sessionFinishedDuration),
+              () {
             appSettings.clear();
             Get.offAllNamed(Routes.login);
           },
         );
         failure = Failure(
-          response!.statusCode.onNull(),
+          statusCode,
           ManagerStrings.sessionFinished,
         );
       } else if (data != null) {
-        final errorMessage = data[Constants.message] ??
-            data[Constants.error]?[Constants.message] ??
-            data[Constants.errors].values.first.first ??
-            Constants.error;
-
-        failure = Failure(
-          statusCode,
-          errorMessage,
-        );
+        final errorMessage = _extractMessageFromData(data);
+        failure = Failure(statusCode, errorMessage);
       } else {
-        failure = Failure(
-          statusCode,
-          Constants.error,
-        );
+        final customMessage = _mapSupabaseError(error.message?.toString() ?? error.toString());
+        failure = Failure(statusCode, customMessage);
       }
     } else {
-      failure = TypeHandlerEnum.unknown.getFailure();
+      final customMessage = _mapSupabaseError(error.toString());
+      failure = Failure(ResponseCode.unKnown, customMessage);
     }
   }
+
+  String _extractMessageFromData(dynamic data) {
+    try {
+      return data[Constants.message] ??
+          data[Constants.error]?[Constants.message] ??
+          data[Constants.errors]?.values.first.first ??
+          Constants.error;
+    } catch (_) {
+      return Constants.error;
+    }
+  }
+
+  String _mapSupabaseError(String message) {
+    message = message.toLowerCase();
+
+    if (message.contains('payload too large') || message.contains('413')) {
+      return ManagerStrings.payloadTooLarge;
+    } else if (message.contains('unauthorized')) {
+      return ManagerStrings.unauthorized;
+    } else if (message.contains('bucket') && message.contains('not found')) {
+      return ManagerStrings.bucketNotFound;
+    } else if (message.contains('quota') && message.contains('exceeded')) {
+      return ManagerStrings.quotaExceeded;
+    } else if (message.contains('connection reset by peer') ||
+        message.contains('network') ||
+        message.contains('socketexception')) {
+      return ManagerStrings.networkError;
+    }
+
+    return ManagerStrings.unknownError;
+  }
 }
+

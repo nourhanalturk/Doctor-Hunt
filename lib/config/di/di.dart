@@ -4,20 +4,43 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
-import '../../core/internet_checker/interent_checker.dart';
+import 'package:tender/features/favorites/domain/di/di.dart';
+import '../../core/internet_checker/internet_checker.dart';
 import '../../core/network/app_api.dart';
 import '../../core/network/dio_factory.dart';
+import '../../core/notifications/notification_permission.dart';
+import '../../core/service/notifications_service.dart';
 import '../constants/constants.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final instance = GetIt.instance;
+final supabase = Supabase.instance.client;
 
 initModule() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
 
   final SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+  // sharedPrefs.clear();
 
+  await Supabase.initialize(
+    url: Constants.supaBaseUrl,
+    anonKey: Constants.supaAnonKey,
+    debug: true,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+    ),
+  );
+
+  if (!GetIt.I.isRegistered<SupabaseClient>()) {
+    instance.registerLazySingleton<SupabaseClient>(
+      () => Supabase.instance.client,
+    );
+  }
 
   if (!GetIt.I.isRegistered<SharedPreferences>()) {
     instance.registerLazySingleton<SharedPreferences>(() => sharedPrefs);
@@ -25,17 +48,11 @@ initModule() async {
 
   if (!GetIt.I.isRegistered<AppSettingsPrefs>()) {
     instance.registerLazySingleton<AppSettingsPrefs>(
-            () => AppSettingsPrefs(instance()));
+        () => AppSettingsPrefs(instance()));
   }
-  // This is not important code
-  // @todo: remove this code
-  // AppSettingsPrefs _app = instance<AppSettingsPrefs>();
-  // var pref = await SharedPreferences.getInstance();
-  // pref.clear();
-
   if (!GetIt.I.isRegistered<NetworkInfo>()) {
     GetIt.I.registerLazySingleton<NetworkInfo>(
-          () => NetworkInfoImpl(
+      () => NetworkInfoImpl(
         InternetConnection.createInstance(
           customCheckOptions: [
             InternetCheckOption(
@@ -44,7 +61,7 @@ initModule() async {
               ),
               timeout: const Duration(
                 seconds: Constants.connectionTimeOut,
-              ), // Set your desired timeout here
+              ),
             )
           ],
         ),
@@ -60,4 +77,9 @@ initModule() async {
     instance.registerLazySingleton<AppService>(() => AppService(dio));
   }
 
+  NotiService().initNotification();
+
+  if (supabase.auth.currentUser != null) {
+    initFavorites();
+  }
 }

@@ -5,10 +5,17 @@ class Constants {
 
     static const String isLoggedIn = "isLoggedIn";
   static const String token = "token";
+  static const String defaultImageUrl ='https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_items_boosted&w=740';
 
+
+
+  ///Supabase constants
+  static const String supaBaseUrl = 'https://xzdxzzvtwrqyxfbimejz.supabase.co';
+  static const String supaAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6ZHh6enZ0d3JxeXhmYmltZWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3NTM3ODAsImV4cCI6MjA2MTMyOTc4MH0.uvTWs6yT7QGmj-ky_v4nmHDHnQNhHIEXOsuBTucb6mU';
 
 
   /// Api Config
+  static const String flutterMapUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   static const int outBoardingDurationTime = 1;
   static const int sessionFinishedDuration = 2;
   static const int sendTimeOutDuration = 120;
@@ -29,5 +36,7 @@ class Constants {
   static const String englishName = 'English';
   static const String english = 'en';
   static const String arabic = 'ar';
+
+  static const int splashTimeSecond = 2;
 
 }

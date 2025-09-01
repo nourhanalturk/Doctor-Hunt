@@ -13,7 +13,35 @@ class ResponseConstants {
   static const String instagram = "instagram";
   static const String gmail = "gmail";
   static const String instructorName = "instructorName";
+  static const String liveDoctors = 'live_doctors';
+  static const String popularDoctors = 'popular_doctors';
+  static const String featuredDoctors = 'featured_doctors';
+  static const createdAt = 'created_at';
+  static const section = 'section';
+  static const name = 'name';
+  static const image = 'image';
+  static const isLive = 'is_live';
+  static const specialty = 'specialty';
+  static const rating = 'rating';
+  static const coastPerHour = 'coast_per_hour';
 
+  static const doctorId = 'doctor_id';
+
+  static const runningPatients = 'running_patient';
+  static const outgoingPatients = 'ongoing_patient';
+  static const patients = 'patient';
+  static const location = 'location';
+  static const services = 'services';
+
+  static const String patientId = "patient_id";
+  static const String fullName = "full_name";
+  static const String contactNumber = "contact_number";
+  static const String profileImageUrl = "profile_image_url";
+
+  static const String appointmentId = 'appointment_id';
+  static const String appointmentTime = 'appointment_time';
+  static const String dependentName = 'dependent_name';
+  static const String dependentImageUrl = 'dependent_image_url';
 
 
 }

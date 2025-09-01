@@ -28,11 +28,24 @@ class AppSettingsPrefs {
     return _sharedPreferences.getString(Constants.token).onNull();
   }
 
+  Future<void> setUserImage({
+    required String imagePath,
+  }) async {
+    await _sharedPreferences.setString(
+      SharedPrefsConstants.patientImage,
+      imagePath,
+    );
+  }
+
+  String getUserImage() {
+    return _sharedPreferences.getString(SharedPrefsConstants.patientImage,).onNullImage();
+  }
+
   /// Set if the user logged in is true
-  Future<void> setUserLoggedIn() async {
+  Future<void> setIsUserLoggedIn(bool isLoggedIn) async {
     await _sharedPreferences.setBool(
       Constants.isLoggedIn,
-      true,
+      isLoggedIn,
     );
   }
 
@@ -53,5 +66,32 @@ class AppSettingsPrefs {
     return _sharedPreferences
         .getString(SharedPrefsConstants.locale)
         .pareWithDefaultLocale();
+  }
+
+  Future<void> setOutBoardingViewed() async {
+    await _sharedPreferences.setBool(
+        SharedPrefsConstants.outBoardingViewed, true);
+  }
+
+  bool getOutBoardingViewed() {
+    return _sharedPreferences
+        .getBool(
+          SharedPrefsConstants.outBoardingViewed,
+        )
+        .onNull();
+  }
+  Future<void> setPatientUid(String uid) async {
+    await _sharedPreferences.setString(SharedPrefsConstants.patientUid, uid);
+  }
+
+  String getPatientUid() {
+    return _sharedPreferences.getString(SharedPrefsConstants.patientUid).onNull();
+  }
+  Future<void> setPatientName(String patientName) async {
+    await _sharedPreferences.setString(SharedPrefsConstants.patientName, patientName);
+  }
+
+  String getPatientName() {
+    return _sharedPreferences.getString(SharedPrefsConstants.patientName).onNull();
   }
 }

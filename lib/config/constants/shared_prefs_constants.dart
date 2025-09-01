@@ -4,4 +4,8 @@ class SharedPrefsConstants {
   static const String appTheme = "isDarkMode";
   static const String isLoggedIn = "isLoggedIn";
   static const String token = "token";
+  static const String patientUid = "patientUid";
+  static const String patientName = "patientName";
+  static const String patientImage = "patientImage";
+
 }
