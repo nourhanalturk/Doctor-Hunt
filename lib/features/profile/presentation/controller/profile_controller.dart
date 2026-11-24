@@ -2,17 +2,20 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tender/config/constants/supabase_tables_constants.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/profile/data/request/profile_request.dart';
+import 'package:tender/features/profile/data/request/update_patient_request.dart';
+import 'package:tender/features/profile/data/request/upload_profile_image_request.dart';
+import 'package:tender/features/profile/domain/usecase/get_current_user_id_usecase.dart';
 import 'package:tender/features/profile/domain/usecase/profile_usecase.dart';
+import 'package:tender/features/profile/domain/usecase/update_patient_usecase.dart';
+import 'package:tender/features/profile/domain/usecase/upload_profile_image_usecase.dart';
 
-import '../../../../config/constants/supabase_fields_constants.dart';
-import '../../../../core/helpers/upload_image_helper.dart';
 import '../../../../core/routes/routes.dart';
 
 class ProfileController extends GetxController {
@@ -41,47 +44,61 @@ class ProfileController extends GetxController {
 
   profileRequest() async {
     ProfileUsecase usecase = instance<ProfileUsecase>();
-    final userId = supabase.auth.currentUser!.id;
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    final userId = userIdResult.fold(
+      (failure) {
+        print(failure.message);
+        return null;
+      },
+      (id) => id,
+    );
+    if (userId == null) return;
+
     (await usecase.execute(
       ProfileRequest(
-          userId: userId,
-          imageUrl: imageUrl,
-          name: nameController.text,
-          contactNumber: contactNumberController.text,
-          location: locationController.text,
-          dateOfBirth: pickedDate!),
+        userId: userId,
+        imageUrl: imageUrl,
+        name: nameController.text,
+        contactNumber: contactNumberController.text,
+        location: locationController.text,
+        dateOfBirth: pickedDate!),
     ))
         .fold(
       (l) {
         print("failed");
       },
-      (r) async{
-       await updatePatientData();
-       Get.snackbar(ManagerStrings.updatedSuccessfully, "");
-       Get.toNamed(Routes.mainHome);
+      (r) async {
+        await updatePatientData();
+        Get.snackbar(ManagerStrings.updatedSuccessfully, "");
+        Get.toNamed(Routes.mainHome);
       },
     );
   }
 
   updatePatientData() async {
-    final userId = supabase.auth.currentUser!.id;
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    final userId = userIdResult.fold(
+      (failure) {
+        print(failure.message);
+        return null;
+      },
+      (id) => id,
+    );
+    if (userId == null) return;
 
-    await supabase
-        .from(SupabaseTableConstants.patients)
-        .update({
-          SupabaseFieldsConstants.fullName: nameController.text,
-          SupabaseFieldsConstants.contactNumber: contactNumberController.text,
-          SupabaseFieldsConstants.profileImageUrl: imageUrl,
-        })
-        .eq('patient_id', userId)
-        .then(
-          (value) {
-            print(value);
-          },
-        )
-        .catchError((e) {
-          print(e);
-        });
+    final result = await instance<UpdatePatientUseCase>().execute(
+      UpdatePatientRequest(
+        patientId: userId,
+        name: nameController.text,
+        contactNumber: contactNumberController.text,
+        imageUrl: imageUrl,
+      ),
+    );
+
+    result.fold(
+      (failure) => print(failure.message),
+      (_) => null,
+    );
   }
 
   XFile? selectedImage;
@@ -93,31 +110,52 @@ class ProfileController extends GetxController {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     final imageFile = File(image!.path);
 
-    const bucketName = 'profile-image';
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    final userId = userIdResult.fold(
+      (failure) {
+        dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: failure.message,
+          title: '',
+        );
+        return null;
+      },
+      (id) => id,
+    );
+    if (userId == null) return;
 
-    final currentImageUrl = imageUrl;
-    if (currentImageUrl != null && currentImageUrl.isNotEmpty) {
-      try {
-        final uri = Uri.parse(currentImageUrl);
-        final fullPath = uri.pathSegments
-            .skipWhile((s) => s != bucketName)
-            .skip(1)
-            .join('/');
+    dialogRender(
+      context: Get.context!,
+      stateRenderType: StateRenderType.popUpLoadingState,
+      message: ManagerStrings.uploadingImage,
+      title: '',
+    );
 
-        await supabase.storage.from(bucketName).remove([fullPath]);
-        print('Previous image removed: $fullPath');
-      } catch (e) {
-        print('Failed to remove previous image: $e');
-      }
-    }
+    final result = await instance<UploadProfileImageUseCase>().execute(
+      UploadProfileImageRequest(
+        image: imageFile,
+        currentImageUrl: imageUrl,
+      ),
+    );
+    Get.back();
 
-    imageUrl = (await uploadImage(bucketName, imageFile))!;
-    if (image == null) return;
-    if (imageUrl != null) {
-      selectedImage = image;
-      prefs.setUserImage(imagePath: imageUrl);
-    }
-    update();
+    result.fold(
+      (failure) {
+        dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: failure.message,
+          title: '',
+        );
+      },
+      (uploadedImage) {
+        imageUrl = uploadedImage.url;
+        selectedImage = image;
+        prefs.setUserImage(imagePath: imageUrl);
+        update();
+      },
+    );
   }
 
   @override

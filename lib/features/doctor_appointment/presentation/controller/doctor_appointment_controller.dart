@@ -4,22 +4,22 @@ import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/service/notifications_service.dart';
-import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/doctor_appointment/data/request/appointment_request.dart';
 
 import '../../../../config/constants/constants.dart';
-import '../../../../config/constants/supabase_fields_constants.dart';
-import '../../../../config/constants/supabase_tables_constants.dart';
 import '../../../../core/helpers/upload_image_helper.dart';
-import '../../domain/di/di.dart';
+import '../../data/request/get_available_times_request.dart';
+import '../../data/request/update_available_time_request.dart';
 import '../../domain/usecase/appointment_usecase.dart';
+import '../../domain/usecase/get_available_times_usecase.dart';
+import '../../domain/usecase/get_current_user_id_usecase.dart';
+import '../../domain/usecase/update_available_time_usecase.dart';
 import '../view/widget/success_appointment_dialog.dart';
 
 class DoctorAppointmentController extends GetxController {
@@ -42,22 +42,21 @@ class DoctorAppointmentController extends GetxController {
   List<int> reminderTimes = [30, 40, 25, 10, 35];
   int reminderTimeIndex = 0;
 
-  onReminderTimesPressed(int index , DateTime appointmentTimeReminder) {
+  onReminderTimesPressed(int index, DateTime appointmentTimeReminder) {
     reminderTimeIndex = index;
-    setReminderNotification(reminderTimes[index],appointmentTimeReminder);
+    setReminderNotification(reminderTimes[index], appointmentTimeReminder);
     update();
   }
 
-  setReminderNotification(int reminderMinutesBefore ,DateTime appointmentTimeUtc)async{
+  setReminderNotification(
+      int reminderMinutesBefore, DateTime appointmentTimeUtc) async {
     await NotiService().initNotification();
 
     final now = DateTime.now();
     final testTime = now.add(Duration(seconds: 15));
 
     // 3. Schedule with hardcoded values
-    await NotiService().scheduleNotification(
-
-    );
+    await NotiService().scheduleNotification();
 
     print('Notification scheduled for ${testTime.toString()}');
   }
@@ -90,15 +89,13 @@ class DoctorAppointmentController extends GetxController {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     final imageFile = File(image!.path);
-    imageUrl = await uploadImage('patient-images',imageFile);
+    imageUrl = await uploadImage('patient-images', imageFile);
     if (image == null) return;
     if (imageUrl != null) {
       selectedImage = image;
     }
     update();
   }
-
-
 
   addAppointment() async {
     if (timeSelected == null) {
@@ -111,22 +108,36 @@ class DoctorAppointmentController extends GetxController {
       return;
     }
 
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    final patientUid = userIdResult.fold(
+      (failure) {
+        dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: failure.message,
+          title: '',
+        );
+        return null;
+      },
+      (id) => id,
+    );
 
+    if (patientUid == null) {
+      return;
+    }
 
-    initAddAppointmentRequest();
     AddAppointmentUseCase useCase = instance<AddAppointmentUseCase>();
-    AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-    final patientUid = supabase.auth.currentUser!.id;
 
-
-    (await useCase.execute(AddAppointmentRequest(
-      doctorId: doctorId,
-      patientId: patientUid,
-      appointmentTime: appointmentTime,
-      contactNumber: contactNumber.text,
-      dependentName: patientName.text,
-      dependentImageUrl: imageUrl.onNull(),
-    ),))
+    (await useCase.execute(
+      AddAppointmentRequest(
+        doctorId: doctorId,
+        patientId: patientUid,
+        appointmentTime: appointmentTime,
+        contactNumber: contactNumber.text,
+        dependentName: patientName.text,
+        dependentImageUrl: imageUrl.onNull(),
+      ),
+    ))
         .fold(
       (l) {
         dialogRender(
@@ -137,27 +148,26 @@ class DoctorAppointmentController extends GetxController {
         );
       },
       (r) async {
-       bool isTimeUpdated =await updateTheDoctorAvailableTime();
+        bool isTimeUpdated = await updateTheDoctorAvailableTime();
 
-       if(isTimeUpdated) {
-         Get.dialog(
-           successAppointmentDialog(
-             doctorName: doctorName,
-             appointmentDate:
-             DateFormat('yyyy-MM-dd').format(selectedDay).toString(),
-             appointmentTime: timeSelected.onNull(),
-             onDonePressed: () {
-               Get.toNamed(Routes.mainHome);
-             },
-             onEditAppointmentPressed: () {
-               Get.back();
-             },
-           ),
-         );
-       }else{
-         updateTheDoctorAvailableTime();
-       }
-
+        if (isTimeUpdated) {
+          Get.dialog(
+            successAppointmentDialog(
+              doctorName: doctorName,
+              appointmentDate:
+                  DateFormat('yyyy-MM-dd').format(selectedDay).toString(),
+              appointmentTime: timeSelected.onNull(),
+              onDonePressed: () {
+                Get.toNamed(Routes.mainHome);
+              },
+              onEditAppointmentPressed: () {
+                Get.back();
+              },
+            ),
+          );
+        } else {
+          updateTheDoctorAvailableTime();
+        }
       },
     );
   }
@@ -165,66 +175,60 @@ class DoctorAppointmentController extends GetxController {
   List<String> availableTimes = [];
   List<DateTime> rawAvailableTimes = [];
 
-  bool isAvailableTimesLoading = false ;
+  bool isAvailableTimesLoading = false;
   Future<List<String>> getAvailableTimes({
     required int doctorId,
     required String date,
   }) async {
-    isAvailableTimesLoading=true;
-    update();
-    final response = await Supabase.instance.client
-        .from(SupabaseTableConstants.availableTimes)
-        .select(SupabaseFieldsConstants.availableTime)
-        .eq(SupabaseFieldsConstants.doctorId, doctorId)
-        .eq(SupabaseFieldsConstants.availableDate, date);
-
-    rawAvailableTimes = response
-        .expand((row) => (row[SupabaseFieldsConstants.availableTime] as List))
-        .map((time) => DateTime.parse('$date ${time.toString()}'))
-        .toList();
-
-    availableTimes =
-        rawAvailableTimes.map((e) => DateFormat('h:mm a').format(e)).toList();
-    timeSelected = availableTimes.isNotEmpty ? availableTimes[0] : null;
-    isAvailableTimesLoading=false;
+    isAvailableTimesLoading = true;
     update();
 
+    final result = await instance<GetAvailableTimesUseCase>().execute(
+      GetAvailableTimesRequest(doctorId: doctorId, date: date),
+    );
+
+    result.fold(
+      (failure) {
+        Get.snackbar(
+          ManagerStrings.unexpectedError,
+          failure.message,
+          snackPosition: SnackPosition.TOP,
+        );
+      },
+      (times) {
+        rawAvailableTimes = times.map((time) => time.dateTime).toList();
+        availableTimes = rawAvailableTimes
+            .map((e) => DateFormat('h:mm a').format(e))
+            .toList();
+        timeSelected = availableTimes.isNotEmpty ? availableTimes[0] : null;
+      },
+    );
+
+    isAvailableTimesLoading = false;
     update();
     return availableTimes;
   }
 
-  updateTheDoctorAvailableTime() async {
-    try {
-      final currentTimes = await Supabase.instance.client
-          .from(SupabaseTableConstants.availableTimes)
-          .select(SupabaseFieldsConstants.availableTime)
-          .eq(SupabaseFieldsConstants.doctorId, doctorId)
-          .eq(SupabaseFieldsConstants.availableDate,
-              DateFormat('yyyy-MM-dd').format(selectedDay))
-          .single();
+  Future<bool> updateTheDoctorAvailableTime() async {
+    final result = await instance<UpdateAvailableTimeUseCase>().execute(
+      UpdateAvailableTimeRequest(
+        doctorId: doctorId,
+        date: DateFormat('yyyy-MM-dd').format(selectedDay),
+        timeToRemove: DateFormat('HH:mm:ss').format(appointmentTime),
+      ),
+    );
 
-      final timeToRemove = DateFormat('HH:mm:ss').format(appointmentTime);
-
-      final updatedTimes =
-          (currentTimes[SupabaseFieldsConstants.availableTime] as List)
-              .where((time) => time != timeToRemove)
-              .toList();
-
-      await Supabase.instance.client
-          .from(SupabaseTableConstants.availableTimes)
-          .update({SupabaseFieldsConstants.availableTime: updatedTimes})
-          .eq(SupabaseFieldsConstants.doctorId, doctorId)
-          .eq(SupabaseFieldsConstants.availableDate,
-              DateFormat('yyyy-MM-dd').format(selectedDay));
-      return true;
-    } catch (e) {
-      Get.snackbar(
-        ManagerStrings.cacheError,
-        ManagerStrings.failedToUpdateDoctorsAvailableTime,
-        snackPosition: SnackPosition.TOP,
-      );
-      return false;
-    }
+    return result.fold(
+      (failure) {
+        Get.snackbar(
+          ManagerStrings.cacheError,
+          ManagerStrings.failedToUpdateDoctorsAvailableTime,
+          snackPosition: SnackPosition.TOP,
+        );
+        return false;
+      },
+      (isUpdated) => isUpdated,
+    );
   }
 
   @override

@@ -1,21 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
-import 'package:tender/core/cache/app_cache.dart';
-import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/core/validator/validator.dart';
-import 'package:tender/features/home/domain/di/di.dart';
-import 'package:tender/features/login/data/request/login_request.dart';
-import 'package:tender/features/login/domain/usecase/login_usecase.dart';
-import '../../../../config/constants/constants.dart';
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/service/email_service.dart';
-import '../../../favorites/domain/di/di.dart';
+import '../../data/request/sign_in_request.dart';
+import '../../domain/model/auth_failure.dart';
+import '../../domain/usecase/is_email_unconfirmed_usecase.dart';
+import '../../domain/usecase/resend_otp_usecase.dart';
+import '../../domain/usecase/sign_in_usecase.dart';
+import 'login_ui_constants.dart';
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -86,69 +84,71 @@ class LoginController extends GetxController {
   Future<void> signIn() async {
     isLoading = 1;
     update();
-    await supabase.auth
-        .signInWithPassword(
-      email: emailController.text,
-      password: passwordController.text,
-    )
-        .then(
-      (value) async {
-        await initFavorites();
+
+    final result = await instance<SignInUseCase>().execute(
+      SignInRequest(
+        email: emailController.text,
+        password: passwordController.text,
+      ),
+    );
+
+    await result.fold(
+      (failure) async {
+        final authFailure = failure is AuthFailure ? failure : null;
+        dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: authFailure?.dialogMessage ?? failure.message,
+          title: '',
+        );
+
+        final emailConfirmationResult =
+            await instance<IsEmailUnconfirmedUseCase>().execute();
+        final isEmailUnconfirmed =
+            emailConfirmationResult.fold((_) => true, (value) => value);
+        if (isEmailUnconfirmed) {
+          resendVerificationEmail();
+        }
+
+        Get.snackbar(
+          failure.message,
+          '',
+          duration: LoginUiConstants.snackbarDuration,
+        );
+        isLoading = 0;
+        update();
+      },
+      (signInResult) async {
         AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
         prefs.setIsUserLoggedIn(true);
         navigateToMain();
         isLoading = 0;
         update();
       },
-    ).catchError((error) {
-      dialogRender(
-          context: Get.context!,
-          stateRenderType: StateRenderType.popUpErrorState,
-          message: error.toString(),
-          title: '');
-
-      final errorMessage =
-          error is AuthException ? error.message : ManagerStrings.unknown;
-
-      if (supabase.auth.currentUser?.emailConfirmedAt.onNull() == null) {
-        resendVerificationEmail();
-      }
-      Get.snackbar(
-        errorMessage,
-        '',
-        duration: const Duration(
-          milliseconds: Constants.sessionFinishedDuration,
-        ),
-      );
-      isLoading = 0;
-      update();
-    });
+    );
   }
 
   Future<void> resendVerificationEmail() async {
-    await supabase.auth
-        .signInWithOtp(
-      email: emailController.text,
-    )
-        .then(
-      (value) {
+    final result =
+        await instance<ResendOtpUseCase>().execute(emailController.text);
+
+    result.fold(
+      (failure) {
+        final authFailure = failure is AuthFailure ? failure : null;
+        Get.snackbar(
+          authFailure?.dialogMessage ?? failure.message,
+          '',
+          duration: LoginUiConstants.snackbarDuration,
+        );
+      },
+      (_) {
         Get.snackbar(
           ManagerStrings.emailVerificationLinkSent,
           '',
-          duration: const Duration(
-            milliseconds: Constants.sessionFinishedDuration,
-          ),
+          duration: LoginUiConstants.snackbarDuration,
         );
       },
-    ).catchError((error) {
-      Get.snackbar(
-        error.toString(),
-        '',
-        duration: const Duration(
-          milliseconds: Constants.sessionFinishedDuration,
-        ),
-      );
-    });
+    );
   }
 
   navigateToMain() {
@@ -191,6 +191,4 @@ class LoginController extends GetxController {
     confirmPasswordFocusNode.dispose();
     super.dispose();
   }
-
-
 }

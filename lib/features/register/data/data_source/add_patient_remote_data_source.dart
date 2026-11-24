@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tender/config/di/di.dart';
+import 'package:tender/config/constants/constants.dart';
+import 'package:tender/config/constants/supabase_tables_constants.dart';
 import 'package:tender/features/register/data/response/add_patient_response.dart';
 
 import '../request/add_patient_request.dart';
@@ -15,7 +16,15 @@ class AddPatientRemoteDataSourceImpl implements AddPatientRemoteDataSource {
 
   @override
   Future<PatientsResponse> addPatient(AddPatientRequest request) async {
-    final response = await supabase.from('patients').insert(request.toJson()).select();
+    final payload = request.toJson();
+    payload['profile_image_url'] =
+        request.profileImageUrl ?? Constants.defaultImageUrl;
+
+    final response = await _client
+        .from(SupabaseTableConstants.patients)
+        .insert(payload)
+        .select();
+
     return PatientsResponse.fromJson(response.first);
   }
 }

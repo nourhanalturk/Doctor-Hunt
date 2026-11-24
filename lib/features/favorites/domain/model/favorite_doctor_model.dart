@@ -12,14 +12,4 @@ class FavoriteDoctorModel {
     required this.image,
     required this.specialty,
   });
-
-  factory FavoriteDoctorModel.fromJson(Map<String, dynamic> json) {
-    return FavoriteDoctorModel(
-      userId: json['user_id'] as String,
-      doctorId: json['doctor_id'] as int,
-      name: json['name'] ?? '',
-      image: json['image'] ?? '',
-      specialty: json['specialty'] ?? '',
-    );
-  }
 }

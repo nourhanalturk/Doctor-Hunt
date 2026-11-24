@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/resources/manager_images.dart';
 import 'package:tender/core/resources/manager_strings.dart';
@@ -8,10 +7,8 @@ import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/main_container/domain/model/menu_item_model.dart';
 
-import '../../../home/domain/di/di.dart';
-import '../../../login/domain/di/di.dart';
 import '../../../login/presentation/controller/login_controller.dart';
-import '../../domain/di/di.dart';
+import '../../domain/usecase/sign_out_usecase.dart';
 
 class MainContainerController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -120,7 +117,7 @@ class MainContainerController extends GetxController
     AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
     prefs.setIsUserLoggedIn(false);
 
-    await Supabase.instance.client.auth.signOut();
+    await instance<SignOutUseCase>().execute();
     await Get.delete<LoginController>(force: true);
     Get.toNamed(Routes.login);
   }

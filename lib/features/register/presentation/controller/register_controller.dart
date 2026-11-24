@@ -1,21 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tender/config/constants/constants.dart';
-import 'package:tender/core/resources/manager_width.dart';
-import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/extensions/extensions.dart';
-import 'package:tender/core/widgets/main_button.dart';
+import 'package:tender/core/resources/manager_strings.dart';
+import 'package:tender/core/routes/routes.dart';
 import 'package:tender/features/register/data/request/add_patient_request.dart';
-import 'package:tender/features/register/domain/di/di.dart';
+import 'package:tender/features/register/data/request/sign_up_request.dart';
+import 'package:tender/features/register/domain/model/auth_failure.dart';
 import 'package:tender/features/register/domain/usecase/add_patient_usecase.dart';
+import 'package:tender/features/register/domain/usecase/is_email_unconfirmed_usecase.dart';
+import 'package:tender/features/register/domain/usecase/resend_verification_email_usecase.dart';
+import 'package:tender/features/register/domain/usecase/sign_up_usecase.dart';
 import '../../../../config/di/di.dart';
 import '../../../../core/cache/app_cache.dart';
-import '../../../../core/resources/manager_strings.dart';
 import '../../../../core/storage/local/app_settings_prefs.dart';
 import '../../../../core/validator/validator.dart';
-import '../../../favorites/domain/di/di.dart';
+import 'register_ui_constants.dart';
 
 class RegisterController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -41,7 +41,7 @@ class RegisterController extends GetxController {
       Get.snackbar(
         'You have to agree the terms ',
         '',
-        duration: const Duration(seconds: 4),
+        duration: RegisterUiConstants.snackbarDuration,
       );
     }
     if (formKey.currentState!.validate() && isChecked == true) {
@@ -64,11 +64,39 @@ class RegisterController extends GetxController {
   Future<void> signUp() async {
     isLoading = 1;
     update();
-    await supabase.auth
-        .signUp(password: passwordController.text, email: emailController.text)
-        .then(
-      (value) async {
-        await initFavorites();
+
+    final result = await instance<SignUpUseCase>().execute(
+      SignUpRequest(
+        email: emailController.text,
+        password: passwordController.text,
+      ),
+    );
+
+    await result.fold(
+      (failure) async {
+        final authFailure = failure is AuthFailure ? failure : null;
+        dialogRender(
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: authFailure?.dialogMessage ?? failure.message,
+          title: '',
+        );
+
+        final emailConfirmationResult =
+            await instance<IsEmailUnconfirmedUseCase>().execute();
+        final isEmailUnconfirmed =
+            emailConfirmationResult.fold((_) => true, (value) => value);
+        if (isEmailUnconfirmed) {
+          resendVerificationEmail();
+        }
+
+        Get.snackbar(
+          failure.message,
+          '',
+          duration: RegisterUiConstants.snackbarDuration,
+        );
+      },
+      (signUpResult) async {
         AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
         prefs.setIsUserLoggedIn(true);
         prefs.setPatientName(nameController.text);
@@ -76,31 +104,12 @@ class RegisterController extends GetxController {
         CacheData.setUserName(name: nameController.text);
         isLoading = 0;
         update();
-        await addPatientAfterSignup(value.user!.id);
+        await addPatientAfterSignup(signUpResult.userId);
       },
-    ).catchError((error) {
-      dialogRender(
-          context: Get.context!,
-          stateRenderType: StateRenderType.popUpErrorState,
-          message: error,
-          title: '');
-      final errorMessage =
-          error is AuthException ? error.message : ManagerStrings.unknown;
-
-      if (supabase.auth.currentUser?.emailConfirmedAt.onNull() == null) {
-        resendVerificationEmail();
-      }
-      Get.snackbar(
-        errorMessage,
-        '',
-        duration:
-            const Duration(milliseconds: Constants.sessionFinishedDuration),
-      );
-    });
+    );
   }
 
   addPatientAfterSignup(String userId) async {
-    initAddPatientRequest();
     dialogRender(
       context: Get.context!,
       stateRenderType: StateRenderType.popUpLoadingState,
@@ -113,7 +122,6 @@ class RegisterController extends GetxController {
         patientId: userId,
         fullName: nameController.text,
         contactNumber: '0599',
-        profileImageUrl: Constants.defaultImageUrl,
       ),
     ))
         .fold(
@@ -130,7 +138,7 @@ class RegisterController extends GetxController {
         prefs.setPatientUid(r.patientId);
         print(prefs.getPatientUid());
         prefs.setPatientName(nameController.text);
-        prefs.setUserImage(imagePath: Constants.defaultImageUrl);
+        prefs.setUserImage(imagePath: r.profileImageUrl.onNull());
         dialogRender(
           context: Get.context!,
           stateRenderType: StateRenderType.popUpSuccessState,
@@ -144,11 +152,10 @@ class RegisterController extends GetxController {
   }
 
   Future<void> resendVerificationEmail() async {
-    await Future.delayed(const Duration(seconds: 60));
+    await Future.delayed(RegisterUiConstants.resendVerificationDelay);
 
-    await supabase.auth.signInWithOtp(
-      email: emailController.text,
-    );
+    await instance<ResendVerificationEmailUseCase>()
+        .execute(emailController.text);
   }
 
   @override

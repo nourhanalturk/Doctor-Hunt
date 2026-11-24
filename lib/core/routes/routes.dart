@@ -140,6 +140,7 @@ class RouteGenerator {
           builder: (context) => const ChatsView(),
         );
       case Routes.messages:
+        disposeMessages();
         initMessages();
         return MaterialPageRoute(
           builder: (context) => const MessagesView(),

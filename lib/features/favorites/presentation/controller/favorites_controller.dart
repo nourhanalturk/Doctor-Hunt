@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
-import 'package:tender/core/storage/local/app_settings_prefs.dart';
-import 'package:tender/features/doctor_details/domain/di/di.dart';
 import 'package:tender/features/favorites/domain/use_case/favorites_usecase.dart';
+import 'package:tender/features/favorites/domain/use_case/get_current_user_id_usecase.dart';
+import 'package:tender/features/favorites/domain/use_case/get_favorite_doctors_usecase.dart';
+
 import '../../domain/model/favorite_doctor_model.dart';
 
 class FavoritesController extends GetxController {
@@ -57,36 +57,42 @@ class FavoritesController extends GetxController {
   Future<void> loadFavoriteDoctors() async {
     isLoading = true;
     update();
-    initDoctorDetailsRequest();
-    final currentUser = supabase.auth.currentUser;
-    if (currentUser == null) return;
 
-    await supabase
-        .from('favorite_doctors_view')
-        .select()
-        .eq('user_id', currentUser.id)
-        .then(
-      (value) {
-        final favoriteDoctors =
-            value.map((e) => FavoriteDoctorModel.fromJson(e)).toList();
-        doctors = favoriteDoctors;
-        isLoading = false;
-        update();
-      },
-    ).catchError((e) {
-      isLoading = false;
-      update();
-    });
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    final userId = userIdResult.fold(
+      (failure) => null,
+      (id) => id,
+    );
+
+    if (userId != null) {
+      final result = await instance<GetFavoriteDoctorsUseCase>().execute(
+        userId,
+      );
+      result.fold(
+        (failure) => null,
+        (favoriteDoctors) => doctors = favoriteDoctors,
+      );
+    }
+
+    isLoading = false;
+    update();
+  }
+
+  Future<void> _loadCurrentUserFavorites() async {
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    final userId = userIdResult.fold(
+      (failure) => null,
+      (id) => id,
+    );
+    if (userId != null) {
+      await loadFavorites(userId);
+    }
   }
 
   @override
   void onInit() {
     loadFavoriteDoctors();
-    final userId = Supabase.instance.client.auth.currentUser;
-    if (userId != null) {
-      loadFavorites(userId.id);
-    }
-
+    _loadCurrentUserFavorites();
     super.onInit();
   }
 }

@@ -1,11 +1,17 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../../../config/constants/supabase_tables_constants.dart';
-import '../../../../config/constants/supabase_fields_constants.dart';
+import 'package:tender/config/constants/supabase_fields_constants.dart';
+import 'package:tender/config/constants/supabase_tables_constants.dart';
+
+import '../response/favorite_doctor_response.dart';
+
+const String _favoriteDoctorsView = 'favorite_doctors_view';
 
 abstract class FavoritesRemoteDataSource {
   Future<List<int>> getFavorites(String userId);
 
   Future<void> toggleFavorite(String userId, int doctorId);
+
+  Future<List<FavoriteDoctorResponse>> getFavoriteDoctors(String userId);
 }
 
 class FavoritesRemoteDataSourceImpl implements FavoritesRemoteDataSource {
@@ -52,5 +58,23 @@ class FavoritesRemoteDataSourceImpl implements FavoritesRemoteDataSource {
       print('Toggle favorite error: $e');
       rethrow;
     }
+  }
+
+  @override
+  Future<List<FavoriteDoctorResponse>> getFavoriteDoctors(
+    String userId,
+  ) async {
+    final response = await client
+        .from(_favoriteDoctorsView)
+        .select()
+        .eq(SupabaseFieldsConstants.userId, userId);
+
+    return (response as List)
+        .map(
+          (e) => FavoriteDoctorResponse.fromJson(
+            Map<String, dynamic>.from(e as Map),
+          ),
+        )
+        .toList();
   }
 }

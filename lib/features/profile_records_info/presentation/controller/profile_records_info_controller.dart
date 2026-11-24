@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
-import 'package:tender/config/constants/supabase_fields_constants.dart';
-import 'package:tender/config/constants/supabase_tables_constants.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/features/profile_records_info/domain/model/patient_model.dart';
 import 'package:tender/features/profile_records_info/domain/model/patient_records_model.dart';
+import 'package:tender/features/profile_records_info/domain/usecase/get_current_user_id_usecase.dart';
+import 'package:tender/features/profile_records_info/domain/usecase/get_patient_info_usecase.dart';
+import 'package:tender/features/profile_records_info/domain/usecase/get_patient_records_usecase.dart';
 
 class ProfileRecordsInfoController extends GetxController {
   String userId = "";
@@ -12,20 +13,17 @@ class ProfileRecordsInfoController extends GetxController {
       PatientModel(fullName: '', contactNumber: '', image: '');
 
   getUserInfo() async {
-    await supabase
-        .from(SupabaseTableConstants.patients)
-        .select()
-        .eq(SupabaseFieldsConstants.patientId, userId)
-        .single()
-        .then(
+    final result = await instance<GetPatientInfoUseCase>().execute(userId);
+    result.fold(
+      (error) {
+        print(error.message);
+      },
       (value) {
-        patientData = PatientModel.fromJson(value);
+        patientData = value;
         update();
         print(patientData);
       },
-    ).catchError((error) {
-      print(error);
-    });
+    );
   }
 
   bool isRecordLoading = true;
@@ -34,33 +32,37 @@ class ProfileRecordsInfoController extends GetxController {
   getPatientRecords() async {
     isRecordLoading = true;
     update();
-    await supabase
-        .from(SupabaseTableConstants.medicalRecords)
-        .select( )
-        .eq(SupabaseFieldsConstants.patientId, userId)
-        .then(
+
+    final result = await instance<GetPatientRecordsUseCase>().execute(userId);
+    result.fold(
+      (error) {
+        isRecordLoading = true;
+        update();
+        print(error.message);
+      },
       (value) {
-        records = value
-            .map(
-              (e) => PatientRecordsModel.fromJson(e),
-            )
-            .toList();
+        records = value;
         print(records);
         isRecordLoading = false;
         update();
       },
-    ).catchError((error) {
-      isRecordLoading = true;
-      update();
-      print(error);
-    });
+    );
+  }
+
+  Future<void> _initialize() async {
+    final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
+    userId = userIdResult.fold(
+      (error) => '',
+      (id) => id,
+    );
+
+    getUserInfo();
+    getPatientRecords();
   }
 
   @override
-  void onInit() async {
-    userId = supabase.auth.currentUser!.id;
-    getUserInfo();
-    getPatientRecords();
+  void onInit() {
     super.onInit();
+    _initialize();
   }
 }

@@ -5,8 +5,11 @@ import 'package:tender/features/bookings/presentation/controller/bookings_contro
 import 'package:tender/features/chat/domain/di/di.dart';
 import '../../../home/domain/di/di.dart';
 import '../../data/data_source/get_appointments_remote_data_source.dart';
+import '../../data/data_source/get_doctor_remote_data_source.dart';
 import '../../data/repository/get_appointments_repository.dart';
+import '../../data/repository/get_doctor_repository.dart';
 import '../usecase/get_appointments_usecase.dart';
+import '../usecase/get_doctor_usecase.dart';
 initGetAppointmentsRequest() {
   if (!GetIt.I.isRegistered<GetAppointmentsRemoteDataSource>()) {
     GetIt.I.registerLazySingleton<GetAppointmentsRemoteDataSource>(
@@ -22,9 +25,36 @@ initGetAppointmentsRequest() {
     GetIt.I.registerFactory<GetAppointmentsUseCase>(
             () => GetAppointmentsUseCase(GetIt.I<GetAppointmentsRepository>()));
   }
+
+  if (!GetIt.I.isRegistered<GetDoctorRemoteDataSource>()) {
+    GetIt.I.registerLazySingleton<GetDoctorRemoteDataSource>(
+            () => GetDoctorRemoteDataSourceImpl(GetIt.I<SupabaseClient>()));
+  }
+
+  if (!GetIt.I.isRegistered<GetDoctorRepository>()) {
+    GetIt.I.registerLazySingleton<GetDoctorRepository>(
+            () => GetDoctorRepositoryImpl(GetIt.I(), GetIt.I()));
+  }
+
+  if (!GetIt.I.isRegistered<GetDoctorUseCase>()) {
+    GetIt.I.registerFactory<GetDoctorUseCase>(
+            () => GetDoctorUseCase(GetIt.I<GetDoctorRepository>()));
+  }
 }
 
 disposeGetAppointmentsRequest() {
+  if (GetIt.I.isRegistered<GetDoctorUseCase>()) {
+    GetIt.I.unregister<GetDoctorUseCase>();
+  }
+
+  if (GetIt.I.isRegistered<GetDoctorRepository>()) {
+    GetIt.I.unregister<GetDoctorRepository>();
+  }
+
+  if (GetIt.I.isRegistered<GetDoctorRemoteDataSource>()) {
+    GetIt.I.unregister<GetDoctorRemoteDataSource>();
+  }
+
   if (GetIt.I.isRegistered<GetAppointmentsRemoteDataSource>()) {
     GetIt.I.unregister<GetAppointmentsRemoteDataSource>();
   }

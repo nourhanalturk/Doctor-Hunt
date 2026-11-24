@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
-import 'package:get_it/get_it.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tender/config/constants/constants.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/resources/manager_colors.dart';
@@ -14,6 +11,7 @@ import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/service/notifications_service.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/home/domain/usecase/home_usecase.dart';
+import 'package:tender/features/home/domain/usecase/sign_out_usecase.dart';
 import '../../../../core/enums/section_enum.dart';
 import '../../../../core/error_handler/failure.dart';
 import '../../../../core/error_handler/server_failure.dart';
@@ -81,7 +79,7 @@ class HomeController extends GetxController {
             message: l.message,
             title: ManagerStrings.sessionFinished,
           );
-          await Supabase.instance.client.auth.signOut();
+          await instance<SignOutUseCase>().execute();
           Get.offAllNamed(Routes.login);
           return;
         }

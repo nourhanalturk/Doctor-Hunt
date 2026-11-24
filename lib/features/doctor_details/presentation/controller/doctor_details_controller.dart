@@ -5,10 +5,10 @@ import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
-import 'package:tender/core/storage/local/app_settings_prefs.dart';
 import 'package:tender/features/doctor_details/data/request/doctor_details_request.dart';
 import 'package:tender/features/doctor_details/domain/model/sub_home_data_model.dart';
 import '../../domain/model/doctor_details_model.dart';
+import '../../domain/usecase/create_or_open_chat_usecase.dart';
 import '../../domain/usecase/doctor_details_usecase.dart';
 
 class DoctorDetailsController extends GetxController {
@@ -89,38 +89,14 @@ class DoctorDetailsController extends GetxController {
   }
 
   createOrOpenChat() async {
-    AppSettingsPrefs prefs = instance<AppSettingsPrefs>();
-    String patientUid = supabase.auth.currentUser!.id;
-
-    final existingResponse = await supabase
-        .from('all_chats')
-        .select()
-        .eq('doctor_id', doctorId)
-        .eq('patient_id', patientUid)
-        .maybeSingle();
-
-    if (existingResponse != null) {
-      final chatUid =await existingResponse['chat_id'];
-      CacheData.setChatUid(chatUid);
-      Get.toNamed(Routes.messages);
-      return;
-    }
-
-    final newChatResponse =await supabase
-        .from('all_chats')
-        .insert({
-          'doctor_id': doctorId,
-          'patient_id': patientUid,
-          'last_message': null,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .select()
-        .single();
-    final chatUid =await newChatResponse['chat_id'];
-    CacheData.setChatUid(chatUid);
-
-    Get.toNamed(Routes.messages);
-
+    CreateOrOpenChatUseCase useCase = instance<CreateOrOpenChatUseCase>();
+    (await useCase.execute(doctorId)).fold(
+      (l) {},
+      (chat) {
+        CacheData.setChatUid(chat.chatUid);
+        Get.toNamed(Routes.messages);
+      },
+    );
   }
 
   @override

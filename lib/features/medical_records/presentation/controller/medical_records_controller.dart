@@ -3,13 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tender/config/constants/supabase_tables_constants.dart';
 import 'package:tender/config/di/di.dart';
-import 'package:tender/core/internet_checker/internet_checker.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
-import '../../../../config/constants/supabase_fields_constants.dart';
+import 'package:tender/features/medical_records/data/request/add_medical_record_request.dart';
+import 'package:tender/features/medical_records/domain/usecase/add_medical_record_usecase.dart';
+import 'package:tender/features/medical_records/domain/usecase/upload_record_image_usecase.dart';
+
 import '../../../../core/validator/validator.dart';
 
 class MedicalRecordsController extends GetxController {
@@ -67,7 +68,6 @@ class MedicalRecordsController extends GetxController {
   }
 
   uploadImage(File image) async {
-    NetworkInfo networkInfo = instance<NetworkInfo>();
     dialogRender(
       context: Get.context!,
       stateRenderType: StateRenderType.popUpLoadingState,
@@ -75,74 +75,69 @@ class MedicalRecordsController extends GetxController {
       title: '',
     );
 
-    if (await networkInfo.isConnected) {
-      final fileName = DateTime.now().microsecondsSinceEpoch.toString();
-      final userId = supabase.auth.currentUser!.id;
-      final path = '$userId/$fileName';
-      await supabase.storage
-          .from(SupabaseTableConstants.records)
-          .upload(path, image)
-          .then(
-        (value) {
-          final url = supabase.storage
-              .from(SupabaseTableConstants.records)
-              .getPublicUrl(path);
-          imageUrl.add(url);
-          Get.toNamed(Routes.addRecord);
-        },
-      ).catchError((e) {
-        print(e);
+    final result = await instance<UploadRecordImageUseCase>().execute(image);
+    result.fold(
+      (failure) {
+        if (failure.message == ManagerStrings.noInternetConnection) return;
 
         dialogRender(
           context: Get.context!,
           stateRenderType: StateRenderType.popUpErrorState,
-          message: '${ManagerStrings.failed} $e',
+          message: '${ManagerStrings.failed} ${failure.message}',
           title: '',
         );
-      });
-    }
+      },
+      (uploadedImage) {
+        imageUrl.add(uploadedImage.url);
+        Get.toNamed(Routes.addRecord);
+      },
+    );
   }
 
   onUploadFilePressed() async {}
 
   addRecord() async {
-    NetworkInfo networkInfo = instance<NetworkInfo>();
-    if (await networkInfo.isConnected) {
-      final patientId = supabase.auth.currentUser!.id;
+    final result = await instance<AddMedicalRecordUseCase>().execute(
+      AddMedicalRecordRequest(
+        recordFor: patientNameController.text,
+        diseaseName: diseaseNameController.text,
+        description: description.text,
+        doctorName: doctorName.text,
+        medicineNames: medicineNames.text,
+        reportDate: convertDateToPostgresFormat(dateController.text),
+        imageUrls: imageUrl,
+      ),
+    );
 
-      await supabase.from(SupabaseTableConstants.medicalRecords).insert({
-        SupabaseFieldsConstants.recordFor: patientNameController.text,
-        SupabaseFieldsConstants.patientId: patientId,
-        SupabaseFieldsConstants.diseaseName: diseaseNameController.text,
-        SupabaseFieldsConstants.description: description.text,
-        SupabaseFieldsConstants.doctorName: doctorName.text,
-        SupabaseFieldsConstants.medicineNames: medicineNames.text,
-        SupabaseFieldsConstants.reportDate:convertDateToPostgresFormat(dateController.text),
-        SupabaseFieldsConstants.imageUrls: imageUrl,
-      }).then(
-        (value) {
-          Get.snackbar(ManagerStrings.done, ManagerStrings.yourRecordSuccessfullyAdded);
-          Get.toNamed(Routes.mainHome);
-          print('added');
-        },
-      ).catchError((e) {
-        print(e);
+    result.fold(
+      (failure) {
+        if (failure.message == ManagerStrings.noInternetConnection) {
+          dialogRender(
+            context: Get.context!,
+            stateRenderType: StateRenderType.popUpErrorState,
+            message: ManagerStrings.noInternetConnection,
+            title: '',
+          );
+          return;
+        }
+
         dialogRender(
           context: Get.context!,
           stateRenderType: StateRenderType.popUpErrorState,
-          message: '${ManagerStrings.failed} $e',
+          message: '${ManagerStrings.failed} ${failure.message}',
           title: '',
         );
-      });
-    } else {
-
-      dialogRender(
-          context: Get.context!,
-          stateRenderType: StateRenderType.popUpErrorState,
-          message: ManagerStrings.noInternetConnection,
-          title: '');
-    }
+      },
+      (_) {
+        Get.snackbar(
+          ManagerStrings.done,
+          ManagerStrings.yourRecordSuccessfullyAdded,
+        );
+        Get.toNamed(Routes.mainHome);
+      },
+    );
   }
+
   String convertDateToPostgresFormat(String input) {
     try {
       final parts = input.split('/');
@@ -157,6 +152,7 @@ class MedicalRecordsController extends GetxController {
       return input; // fallback
     }
   }
+
   @override
   void onInit() {
     patientName = prefs.getPatientName();

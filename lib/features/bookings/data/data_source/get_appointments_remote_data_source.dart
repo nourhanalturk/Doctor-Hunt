@@ -1,10 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../config/constants/supabase_fields_constants.dart';
 import '../../../../config/constants/supabase_tables_constants.dart';
-import '../request/get_appointment_request.dart';
 import '../response/get_appointments_response.dart';
 
 abstract class GetAppointmentsRemoteDataSource {
-  Future<List<GetAppointmentsResponse>> getAppointments(GetAppointmentsRequest request);
+  Future<List<GetAppointmentsResponse>> getAppointments();
 }
 
 class GetAppointmentsRemoteDataSourceImpl implements GetAppointmentsRemoteDataSource {
@@ -13,11 +13,12 @@ class GetAppointmentsRemoteDataSourceImpl implements GetAppointmentsRemoteDataSo
   GetAppointmentsRemoteDataSourceImpl(this.client);
 
   @override
-  Future<List<GetAppointmentsResponse>> getAppointments(GetAppointmentsRequest request) async {
+  Future<List<GetAppointmentsResponse>> getAppointments() async {
+    final patientId = client.auth.currentUser!.id;
     final response = await client
         .from(SupabaseTableConstants.appointments)
         .select()
-        .eq('patient_id', request.userId);
+        .eq(SupabaseFieldsConstants.patientId, patientId);
 
     if (response.isEmpty) {
       return [];

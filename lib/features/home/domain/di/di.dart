@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/features/bookings/domain/di/di.dart';
 import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/doctor_appointment/domain/di/di.dart';
@@ -10,13 +11,17 @@ import 'package:tender/features/profile_records_info/domain/di/di.dart';
 import '../../../../config/di/di.dart';
 import '../../../main_container/domain/di/di.dart';
 import '../../data/data_source/home_data_remote_data_source.dart';
+import '../../data/data_source/sign_out_data_source.dart';
 import '../../data/repository/home_data_repository.dart';
+import '../../data/repository/sign_out_repository.dart';
 import '../usecase/home_usecase.dart';
+import '../usecase/sign_out_usecase.dart';
 
 initHomeRequest() {
   if (!GetIt.I.isRegistered<HomeRemoteDataSource>()) {
     instance.registerLazySingleton<HomeRemoteDataSource>(
-        () => HomeRemoteDataSourceImpl());
+      () => HomeRemoteDataSourceImpl(instance<SupabaseClient>()),
+    );
   }
 
   if (!GetIt.I.isRegistered<HomeRepository>()) {
@@ -28,9 +33,39 @@ initHomeRequest() {
     instance.registerFactory<HomeUsecase>(
         () => HomeUsecase(instance<HomeRepository>()));
   }
+
+  if (!GetIt.I.isRegistered<SignOutDataSource>()) {
+    instance.registerLazySingleton<SignOutDataSource>(
+      () => SignOutDataSourceImpl(instance<SupabaseClient>()),
+    );
+  }
+
+  if (!GetIt.I.isRegistered<SignOutRepository>()) {
+    instance.registerLazySingleton<SignOutRepository>(
+      () => SignOutRepositoryImpl(instance(), instance()),
+    );
+  }
+
+  if (!GetIt.I.isRegistered<SignOutUseCase>()) {
+    instance.registerFactory<SignOutUseCase>(
+      () => SignOutUseCase(instance<SignOutRepository>()),
+    );
+  }
 }
 
 disposeHomeRequest() {
+  if (GetIt.I.isRegistered<SignOutUseCase>()) {
+    instance.unregister<SignOutUseCase>();
+  }
+
+  if (GetIt.I.isRegistered<SignOutRepository>()) {
+    instance.unregister<SignOutRepository>();
+  }
+
+  if (GetIt.I.isRegistered<SignOutDataSource>()) {
+    instance.unregister<SignOutDataSource>();
+  }
+
   if (GetIt.I.isRegistered<HomeRemoteDataSource>()) {
     instance.unregister<HomeRemoteDataSource>();
   }

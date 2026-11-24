@@ -1,26 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tender/config/di/di.dart';
-import 'package:tender/core/internet_checker/internet_checker.dart';
 import 'package:tender/core/resources/manager_images.dart';
 import 'package:tender/core/routes/routes.dart';
-import 'package:tender/features/bookings/domain/di/di.dart';
 import 'package:tender/features/bookings/presentation/view/bookings_view.dart';
-import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/chat/presentation/view/chats_view.dart';
-import 'package:tender/features/home/domain/di/di.dart';
-import 'package:tender/features/home/presentation/view/home_view.dart';
-import 'package:tender/features/main_container/domain/di/di.dart';
 import 'package:tender/features/main_container/presentation/controller/main_container_controller.dart';
 import 'package:tender/features/main_container/presentation/view/main_container_view.dart';
 import '../../../../core/resources/manager_colors.dart';
-import '../../../favorites/domain/di/di.dart';
 import '../../../favorites/presentation/view/favorites_view.dart';
+import '../../domain/di/di.dart';
+import '../../domain/model/auth_state_model.dart';
+import '../../domain/usecase/check_internet_connection_usecase.dart';
+import '../../domain/usecase/watch_auth_state_usecase.dart';
 
 class MainHomeController extends GetxController {
   int currentBottomNavIndex = 0;
+
+  StreamSubscription<AuthStateModel>? _authStateSubscription;
 
   final MainContainerController mainContainerController = Get.find();
 
@@ -58,20 +58,7 @@ class MainHomeController extends GetxController {
     update();
   }
 
-  initDI() {
-    switch (currentBottomNavIndex) {
-      case 0:
-        {
-          initHome();
-        }
-      case 1:
-        initFavorites();
-      case 2:
-        initBookings();
-      case 3:
-        initChats();
-    }
-  }
+  initDI() => initMainHomeTab(currentBottomNavIndex);
 
   List<Widget> pages = [
     const MainContainerView(),
@@ -80,32 +67,40 @@ class MainHomeController extends GetxController {
     const ChatsView(),
   ];
 
-  void listenToAuthChanges() {
-    final supabase = Supabase.instance.client;
+  void listenToAuthChanges() async {
+    final result = await instance<WatchAuthStateUseCase>().execute();
 
-    supabase.auth.onAuthStateChange.listen((data) {
-      final event = data.event;
-      final session = data.session;
+    result.fold(
+      (_) => null,
+      (stream) {
+        _authStateSubscription = stream.listen((state) {
+          print('Auth event: ${state.event}');
+          print('User id: ${state.userId}');
 
-      print('Auth event: $event');
-      print('User id: ${session?.user?.id}');
-
-      if (session == null) {
-        Get.toNamed(Routes.login);
-      }
-    });
+          if (!state.hasSession) {
+            Get.toNamed(Routes.login);
+          }
+        });
+      },
+    );
   }
-  checkInternetConnection()async{
-    NetworkInfo networkInfo = instance<NetworkInfo>();
-    if(!await networkInfo.isConnected){
 
-    }
+  checkInternetConnection() async {
+    await instance<CheckInternetConnectionUseCase>().execute();
   }
+
   @override
   void onInit() {
     listenToAuthChanges();
     initDI();
     checkInternetConnection();
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    _authStateSubscription?.cancel();
+    _authStateSubscription = null;
+    super.onClose();
   }
 }
