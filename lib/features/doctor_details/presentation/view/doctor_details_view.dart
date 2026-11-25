@@ -14,6 +14,7 @@ import 'package:tender/core/resources/manager_radius.dart';
 import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/resources/manager_styles.dart';
 import 'package:tender/core/resources/manager_width.dart';
+import 'package:tender/core/widgets/app_tile_provider.dart';
 import 'package:tender/core/widgets/custom_app_bar.dart';
 import 'package:tender/core/widgets/doctor_details_card.dart';
 import 'package:tender/core/widgets/main_background.dart';
@@ -239,6 +240,7 @@ class DoctorDetailsView extends StatelessWidget {
                             children: [
                               TileLayer(
                                 urlTemplate: Constants.flutterMapUrl,
+                                tileProvider: AppTileProviders.openStreetMap,
                               ),
                               MarkerLayer(
                                 markers: [

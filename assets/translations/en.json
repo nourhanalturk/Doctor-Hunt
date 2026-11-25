@@ -222,6 +222,7 @@
   "doctorName": "Doctor Name",
   "profileInfo": "Profile Information",
   "patientRecords": "Patient Records",
+  "appointmentPending": "Pending",
   "chatWithYourDoctorsHere": "Chat With Your Doctors ",
   "myAppointments": "My Appointments",
   "noAppointmentsYet": "No appointments yet",

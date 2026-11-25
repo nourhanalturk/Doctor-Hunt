@@ -10,6 +10,7 @@ import 'package:tender/core/resources/manager_strings.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/core/service/notifications_service.dart';
 import 'package:tender/core/storage/local/app_settings_prefs.dart';
+import 'package:tender/features/home/domain/usecase/get_patient_full_name_usecase.dart';
 import 'package:tender/features/home/domain/usecase/home_usecase.dart';
 import 'package:tender/features/home/domain/usecase/sign_out_usecase.dart';
 import '../../../../core/enums/section_enum.dart';
@@ -183,6 +184,16 @@ class HomeController extends GetxController {
   refreshUserImage(){
     userImage =  prefs.getUserImage();
     update();
+    fetchPatientFullName();
+  }
+
+  Future<void> fetchPatientFullName() async {
+    final result = await instance<GetPatientFullNameUseCase>().execute();
+    result.fold(
+      (_) => userName = prefs.getPatientName() ?? '',
+      (fullName) => userName = fullName,
+    );
+    update();
   }
 
 
@@ -195,5 +206,6 @@ class HomeController extends GetxController {
     homeRequest();
     userName = prefs.getPatientName() ?? '';
     userImage =  prefs.getUserImage();
+    fetchPatientFullName();
   }
 }

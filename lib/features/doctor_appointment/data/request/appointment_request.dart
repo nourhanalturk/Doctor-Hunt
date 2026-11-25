@@ -4,7 +4,7 @@ class AddAppointmentRequest {
   final int doctorId;
   final String patientId;
   final DateTime appointmentTime;
-  final String? status;
+  final String status;
   final String? dependentName;
   final String? contactNumber;
   final String? dependentImageUrl;
@@ -13,7 +13,7 @@ class AddAppointmentRequest {
     required this.doctorId,
     required this.patientId,
     required this.appointmentTime,
-    this.status,
+    this.status = 'pending',
     this.dependentName,
     this.contactNumber,
     this.dependentImageUrl,

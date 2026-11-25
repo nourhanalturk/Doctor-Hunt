@@ -9,41 +9,64 @@ import 'package:tender/features/bookings/domain/usecase/get_doctor_usecase.dart'
 import 'package:tender/features/doctor_appointment/domain/model/appointment_model.dart';
 
 class BookingsController extends GetxController {
+  static const String statusPending = 'pending';
+  static const String statusDone = 'done';
+  static const String statusCancelled = 'cancelled';
+
   List<AppointmentModel> userBookingsAppointments = [];
 
-  bool isLoading =false;
+  bool isLoading = false;
+
   getUserAppointments() async {
-    isLoading =true ;
+    isLoading = true;
     update();
     GetAppointmentsUseCase useCase = instance<GetAppointmentsUseCase>();
     (await useCase.execute()).fold(
       (l) {
-        isLoading =false ;
+        isLoading = false;
         update();
         dialogRender(
-            context: Get.context!,
-            stateRenderType: StateRenderType.popUpErrorState,
-            message: l.message,
-            title: '');
+          context: Get.context!,
+          stateRenderType: StateRenderType.popUpErrorState,
+          message: l.message,
+          title: '',
+        );
       },
       (r) {
-        isLoading =false ;
-        update();
-        userBookingsAppointments = r;
-        print(userBookingsAppointments);
+        isLoading = false;
+        final now = DateTime.now();
+        final startOfToday = DateTime(now.year, now.month, now.day);
+
+        userBookingsAppointments = r.where((appointment) {
+          if (appointment.appointmentTime.isBefore(startOfToday)) {
+            return false;
+          }
+          final status = appointment.status.trim().toLowerCase();
+          if (status.isEmpty) {
+            return true;
+          }
+          return status != statusDone && status != statusCancelled;
+        }).toList()
+          ..sort(
+            (a, b) => a.appointmentTime.compareTo(b.appointmentTime),
+          );
 
         update();
       },
     );
   }
 
-  String formattedDate = '';
+  String formatDate(DateTime dateTime) =>
+      DateFormat('d MMM').format(dateTime);
 
-  String formattedTime = '';
+  String formatTime(DateTime dateTime) =>
+      DateFormat('h:mm a').format(dateTime);
 
-  convertDateTime(DateTime dateTime) {
-    formattedDate = DateFormat('d MMM').format(dateTime);
-    formattedTime = DateFormat('h:mm a').format(dateTime);
+  String statusLabel(String status) {
+    final normalized = status.trim().toLowerCase();
+    if (normalized == statusDone) return 'done';
+    if (normalized == statusCancelled) return 'cancelled';
+    return 'pending';
   }
 
   String doctorName = '';

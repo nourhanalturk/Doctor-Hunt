@@ -6,6 +6,8 @@ import '../response/home_data_response.dart';
 
 abstract class HomeRemoteDataSource {
   Future<List<HomeResponse>> getHomeSections();
+
+  Future<String?> getPatientFullName();
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
@@ -28,5 +30,21 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     ''').order(SupabaseFieldsConstants.createdAt, ascending: false);
 
     return response.map((json) => HomeResponse.fromJson(json)).toList();
+  }
+
+  @override
+  Future<String?> getPatientFullName() async {
+    final patientId = client.auth.currentUser?.id;
+    if (patientId == null) {
+      return null;
+    }
+
+    final response = await client
+        .from(SupabaseTableConstants.patients)
+        .select(SupabaseFieldsConstants.fullName)
+        .eq(SupabaseFieldsConstants.patientId, patientId)
+        .maybeSingle();
+
+    return response?[SupabaseFieldsConstants.fullName] as String?;
   }
 }

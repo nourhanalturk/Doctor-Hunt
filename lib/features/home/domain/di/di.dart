@@ -5,6 +5,7 @@ import 'package:tender/features/bookings/domain/di/di.dart';
 import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/doctor_appointment/domain/di/di.dart';
 import 'package:tender/features/home/presentation/controller/home_controller.dart';
+import 'package:tender/features/home/domain/usecase/get_patient_full_name_usecase.dart';
 import 'package:tender/features/login/domain/di/di.dart';
 import 'package:tender/features/profile/domain/di/di.dart';
 import 'package:tender/features/profile_records_info/domain/di/di.dart';
@@ -32,6 +33,12 @@ initHomeRequest() {
   if (!GetIt.I.isRegistered<HomeUsecase>()) {
     instance.registerFactory<HomeUsecase>(
         () => HomeUsecase(instance<HomeRepository>()));
+  }
+
+  if (!GetIt.I.isRegistered<GetPatientFullNameUseCase>()) {
+    instance.registerFactory<GetPatientFullNameUseCase>(
+      () => GetPatientFullNameUseCase(instance<HomeRepository>()),
+    );
   }
 
   if (!GetIt.I.isRegistered<SignOutDataSource>()) {
@@ -76,6 +83,10 @@ disposeHomeRequest() {
 
   if (GetIt.I.isRegistered<HomeUsecase>()) {
     instance.unregister<HomeUsecase>();
+  }
+
+  if (GetIt.I.isRegistered<GetPatientFullNameUseCase>()) {
+    instance.unregister<GetPatientFullNameUseCase>();
   }
 }
 

@@ -477,6 +477,7 @@ class ManagerStrings {
   static String get hereWhereYouCanSeeAllYourBookingAppointments => tr('hereWhereYouCanSeeAllYourBookingAppointments');
   static String get profileInfo => tr('profileInfo');
   static String get patientRecords => tr('patientRecords');
+  static String get appointmentPending => tr('appointmentPending');
   static String get chatWithYourDoctorsHere => tr('chatWithYourDoctorsHere');
   static String get myAppointments => tr('myAppointments');
 

@@ -12,6 +12,8 @@ import '../data_source/home_data_remote_data_source.dart';
 
 abstract class HomeRepository {
   Future<Either<Failure, List<HomeModel>>> getHomeSections();
+
+  Future<Either<Failure, String>> getPatientFullName();
 //Future<Either<Failure, void>> addHomeSection(HomeModel model);
 }
 
@@ -32,6 +34,29 @@ class HomeRepositoryImpl implements HomeRepository {
       } catch (e) {
         return Left(
             ServerFailure('${ManagerStrings.unexpectedError} ${e.toString()}'));
+      }
+    } else {
+      return Left(
+        Failure(
+          ResponseCode.noInternetConnection,
+          ManagerStrings.noInternetConnection,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> getPatientFullName() async {
+    if (await networkInfo.isConnected) {
+      try {
+        final fullName = await dataSource.getPatientFullName();
+        return Right(fullName ?? '');
+      } on PostgrestException catch (e) {
+        return Left(ServerFailure(e.message));
+      } catch (e) {
+        return Left(
+          ServerFailure('${ManagerStrings.unexpectedError} ${e.toString()}'),
+        );
       }
     } else {
       return Left(
