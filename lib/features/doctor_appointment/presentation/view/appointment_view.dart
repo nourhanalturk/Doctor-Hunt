@@ -2,414 +2,489 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:tender/core/resources/manager_height.dart';
-import 'package:tender/core/resources/manager_icon_size.dart';
-import 'package:tender/core/resources/manager_icons.dart';
-import 'package:tender/core/resources/manager_opacity.dart';
+import 'package:tender/core/resources/manager_fonts.dart';
 import 'package:tender/core/resources/manager_strings.dart';
-import 'package:tender/core/resources/manager_width.dart';
-import 'package:tender/core/widgets/custom_app_bar.dart';
+import 'package:tender/core/widgets/glass_card.dart';
 import 'package:tender/core/widgets/main_background.dart';
-import 'package:tender/core/widgets/main_button.dart';
-import 'package:tender/core/widgets/text_field.dart';
+import 'package:tender/core/widgets/modern_action_button.dart';
+import 'package:tender/core/widgets/modern_choice_chip.dart';
+import 'package:tender/core/widgets/modern_doctor_card.dart';
+import 'package:tender/core/widgets/modern_sub_page_header.dart';
+import 'package:tender/core/widgets/modern_text_field.dart';
+import 'package:tender/core/widgets/shimmer/shimmer_time_circle.dart';
 import 'package:tender/features/doctor_appointment/presentation/controller/doctor_appointment_controller.dart';
-import '../../../../core/enums/doctor_card_enum.dart';
-import '../../../../core/resources/manager_colors.dart';
-import '../../../../core/resources/manager_font_size.dart';
-import '../../../../core/resources/manager_radius.dart';
-import '../../../../core/resources/manager_styles.dart';
-import '../../../../core/widgets/doctor_details_card.dart';
-import '../../../../core/widgets/shimmer/shimmer_time_circle.dart';
 
 class DoctorAppointmentView extends StatelessWidget {
   const DoctorAppointmentView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return AppScaffold(
-      body: GetBuilder<DoctorAppointmentController>(
-        builder: (controller) {
-          return Column(
+    return GetBuilder<DoctorAppointmentController>(builder: (controller) {
+      return AppScaffold(
+        body: Column(
+          children: [
+            ModernSubPageHeader(
+              title: ManagerStrings.appointment,
+              subtitle: ManagerStrings.dateAndTime,
+              onBack: () => Get.back(),
+            ),
+            _stepIndicator(),
+            Expanded(
+              child: PageView(
+                controller: controller.pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _patientStep(controller),
+                  _scheduleStep(controller),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _stepIndicator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+      child: Row(
+        children: [
+          _stepDot(index: 0, label: ManagerStrings.yourDetails),
+          Expanded(
+            child: Container(
+              height: 2,
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              color: const Color(0xFFBFE4D0),
+            ),
+          ),
+          _stepDot(index: 1, label: ManagerStrings.dateAndTime),
+        ],
+      ),
+    );
+  }
+
+  Widget _stepDot({required int index, required String label}) {
+    return GetBuilder<DoctorAppointmentController>(builder: (controller) {
+      final bool active = controller.pageController.hasClients
+          ? (controller.pageController.page?.round() ?? 0) == index
+          : index == 0;
+      final Color color = active
+          ? const Color(0xFF168A57)
+          : const Color(0xFF9EACA6);
+
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: active ? color : const Color(0xFFE6F0EA),
+              border: Border.all(color: color, width: 1.5),
+            ),
+            child: Center(
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  fontFamily: ManagerFontFamily.fontFamily,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: active ? Colors.white : color,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: ManagerFontFamily.fontFamily,
+              fontSize: 11.5,
+              fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _patientStep(DoctorAppointmentController controller) {
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 24),
+      children: [
+        ModernDoctorCard(
+          doctorId: controller.doctorId,
+          name: controller.doctorName,
+          specialty: controller.doctorSpeciality,
+          imageUrl: controller.doctorImage,
+          rating: controller.doctorRating,
+          priceLabel:
+              '${ManagerStrings.dollarSign}${controller.doctorCoastPerHour.toStringAsFixed(0)}${ManagerStrings.byHour}',
+          compact: true,
+        ),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(start: 22, top: 16, bottom: 12),
+          child: Text(
+            ManagerStrings.appointmentFor,
+            style: TextStyle(
+              fontFamily: ManagerFontFamily.fontFamily,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: const Color(0xFF154734),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ManagerWidth.w15,
-                  vertical: ManagerWidth.w10,
-                ),
-                child: customAppBar(
-                  onSearchButtonPressed: () {},
-                  appBarTitle: ManagerStrings.appointment,
-                ),
+              ModernTextField(
+                controller: controller.patientName,
+                label: ManagerStrings.patientName,
+                icon: Icons.person_outline_rounded,
               ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_03,
+              const SizedBox(height: 12),
+              ModernTextField(
+                controller: controller.contactNumber,
+                label: ManagerStrings.contactNumber,
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
               ),
-              Expanded(
-                child: PageView(
-                  controller: controller.pageController,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(
-                        ManagerWidth.w15,
-                      ),
-                      child: ListView(
-                        children: [
-                          mainDoctorCard(
-                            cardHeight: size.height * ManagerOpacity.op0_18,
-                            image: controller.doctorImage,
-                            doctorName: controller.doctorName,
-                            doctorSpeciality: controller.doctorSpeciality,
-                            onFavoritesPressed: () {},
-                            cardEnum: DoctorCardEnum.appointmentDoctorCard,
-                            costPerHour:
-                                controller.doctorCoastPerHour.toString(),
-                            doctorRate: controller.doctorRating,
-                            doctorId: controller.doctorId,
-                          ),
-                          SizedBox(
-                            height: size.height * ManagerOpacity.op0_05,
-                          ),
-                          Text(
-                            ManagerStrings.appointmentFor,
-                            style: getBoldTextStyle(
-                              fontSize: ManagerFontSize.s20,
-                              color: ManagerColors.black,
-                            ),
-                          ),
-                          SizedBox(
-                            height: size.height * ManagerOpacity.op0_05,
-                          ),
-                          textField(
-                            controller: controller.patientName,
-                            hintText: ManagerStrings.patientName,
-                            hintColor: ManagerColors.blueBell,
-                          ),
-                          SizedBox(
-                            height: size.height * ManagerOpacity.op0_02,
-                          ),
-                          textField(
-                            controller: controller.contactNumber,
-                            hintText: ManagerStrings.contactNumber,
-                            hintColor: ManagerColors.blueBell,
-                          ),
-                          SizedBox(
-                            height: size.height * ManagerOpacity.op0_05,
-                          ),
-                          Text(
-                            ManagerStrings.whoIsPatient,
-                            style: getBoldTextStyle(
-                              fontSize: ManagerFontSize.s20,
-                              color: ManagerColors.black,
-                            ),
-                          ),
-                          SizedBox(
-                            height: size.height * ManagerOpacity.op0_02,
-                          ),
-                          Row(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    controller.pickImage();
-                                  },
-                                  child: Container(
-                                    width: size.width * ManagerOpacity.op0_3,
-                                    height: size.height * ManagerOpacity.op0_17,
-                                    decoration: BoxDecoration(
-                                      color: ManagerColors.primaryColor
-                                          .withOpacity(ManagerOpacity.op0_2),
-                                      borderRadius: BorderRadius.circular(
-                                        ManagerRadius.r12,
+              const SizedBox(height: 18),
+              GlassCard(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.all(14),
+                child: InkWell(
+                  onTap: controller.pickImage,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE3F5EB),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: controller.selectedImage == null
+                            ? controller.isUploadingImage
+                                ? const Center(
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Color(0xFF168A57),
                                       ),
                                     ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          ManagerIcons.add,
-                                          color: ManagerColors.primaryColor,
-                                          size: ManagerIconSize.s50,
-                                        ),
-                                        Text(
-                                          ManagerStrings.add,
-                                          style: getMediumTextStyle(
-                                              fontSize: ManagerFontSize.s20,
-                                              color:
-                                                  ManagerColors.primaryColor),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                  )
+                                : const Icon(
+                                    Icons.add_a_photo_outlined,
+                                    color: Color(0xFF168A57),
+                                  )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.file(
+                                  File(controller.selectedImage!.path),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              SizedBox(
-                                width: ManagerWidth.w10,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              controller.isUploadingImage
+                                  ? ManagerStrings.uploadingImage
+                                  : ManagerStrings.patientPhoto,
+                              style: TextStyle(
+                                fontFamily: ManagerFontFamily.fontFamily,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF154734),
                               ),
-                              if (controller.selectedImage != null)
-                                SizedBox(
-                                  width: size.width * ManagerOpacity.op0_3,
-                                  height: size.height * ManagerOpacity.op0_15,
-                                  child: Image.file(
-                                    File(controller.selectedImage!.path),
-                                    width: 200,
-                                    height: 200,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: size.height * ManagerOpacity.op0_02,
-                          ),
-                          mainButton(
-                              onPressed: () {
-                                controller.onNextPressed();
-                              },
-                              buttonText: ManagerStrings.next)
-                        ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              controller.imageUrl == null
+                                  ? ManagerStrings.add
+                                  : ManagerStrings.done,
+                              style: TextStyle(
+                                fontFamily: ManagerFontFamily.fontFamily,
+                                fontSize: 12,
+                                color: const Color(0xFF6E7B76),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.camera_alt_outlined,
+                        size: 19,
+                        color: Color(0xFF168A57),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              ModernActionButton(
+                label: ManagerStrings.next,
+                icon: Icons.arrow_forward_rounded,
+                onPressed: controller.onNextPressed,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _scheduleStep(DoctorAppointmentController controller) {
+    final DateTime now = DateTime.now();
+    final DateTime startOfToday = DateTime(now.year, now.month, now.day);
+
+    return Column(
+      children: [
+        GlassCard(
+          margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          padding: const EdgeInsets.all(6),
+          borderRadius: 22,
+          child: TableCalendar(
+            firstDay: startOfToday,
+            lastDay: startOfToday.add(const Duration(days: 365)),
+            focusedDay: controller.focusedDay,
+            calendarFormat: CalendarFormat.week,
+            availableCalendarFormats: const {
+              CalendarFormat.week: 'Week',
+            },
+            selectedDayPredicate: (day) => isSameDay(controller.selectedDay, day),
+            enabledDayPredicate: (day) => !day.isBefore(startOfToday),
+            onDaySelected: (selectedDay, focusedDay) {
+              controller.onFocusDayChanged(selectedDay, focusedDay);
+            },
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                fontFamily: ManagerFontFamily.fontFamily,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF154734),
+              ),
+              leftChevronIcon: const Icon(
+                Icons.chevron_left_rounded,
+                color: Color(0xFF168A57),
+              ),
+              rightChevronIcon: const Icon(
+                Icons.chevron_right_rounded,
+                color: Color(0xFF168A57),
+              ),
+            ),
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(
+                fontFamily: ManagerFontFamily.fontFamily,
+                fontSize: 11,
+                color: const Color(0xFF6E7B76),
+              ),
+              weekendStyle: TextStyle(
+                fontFamily: ManagerFontFamily.fontFamily,
+                fontSize: 11,
+                color: const Color(0xFF168A57),
+              ),
+            ),
+            calendarStyle: CalendarStyle(
+              selectedDecoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFF168A57),
+              ),
+              todayDecoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0x66168A57),
+              ),
+              selectedTextStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
+              defaultTextStyle: TextStyle(
+                fontFamily: ManagerFontFamily.fontFamily,
+                fontSize: 12,
+                color: const Color(0xFF3D4B45),
+              ),
+              disabledTextStyle: const TextStyle(color: Color(0xFFC6D0CB)),
+            ),
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: GlassCard(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionLabel(Icons.access_time_rounded, ManagerStrings.chooseTime),
+                  const SizedBox(height: 12),
+                  if (controller.isAvailableTimesLoading)
+                    SizedBox(
+                      height: 54,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 4,
+                        separatorBuilder: (_, __) => const SizedBox(width: 10),
+                        itemBuilder: (_, __) => const ShimmerTimeCircle(),
+                      ),
+                    )
+                  else if (controller.availableTimes.isEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF4F8F6),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        ManagerStrings.noAvailableTimeForTheDoctorToday,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: ManagerFontFamily.fontFamily,
+                          fontSize: 12,
+                          color: const Color(0xFF7E8A86),
+                        ),
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      height: 54,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: controller.availableTimes.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 10),
+                        itemBuilder: (context, index) {
+                          return ModernChoiceChip(
+                            label: controller.availableTimes[index],
+                            selected:
+                                controller.appointmentTimeSelectedIndex == index,
+                            icon: Icons.schedule_rounded,
+                            onTap: () => controller.onSelectTime(index),
+                          );
+                        },
                       ),
                     ),
-                    Column(
+                  const SizedBox(height: 18),
+                  _sectionLabel(
+                    Icons.notifications_none_rounded,
+                    ManagerStrings.reminderMeBefore,
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 52,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.reminderTimes.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      itemBuilder: (context, index) {
+                        return ModernChoiceChip(
+                          label:
+                              '${controller.reminderTimes[index]}\n${ManagerStrings.minit}',
+                          selected: controller.reminderTimeIndex == index,
+                          width: 74,
+                          onTap: () => controller.onReminderTimesPressed(index),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF7F0),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TableCalendar(
-                            firstDay: DateTime.utc(2010, 10, 16),
-                            lastDay: DateTime.utc(2030, 3, 14),
-                            focusedDay: controller.focusedDay,
-                            selectedDayPredicate: (day) {
-                              return isSameDay(controller.selectedDay, day);
-                            },
-                            onDaySelected: (selectedDay, focusedDay) {
-                              controller.onFocusDayChanged(
-                                  selectedDay, focusedDay);
-                            },
-                            enabledDayPredicate: (day) {
-                              return !day.isBefore(
-                                DateTime.now().subtract(
-                                  Duration(
-                                    hours: DateTime.now().hour,
-                                    minutes: DateTime.now().minute,
-                                    seconds: DateTime.now().second,
-                                  ),
-                                ),
-                              );
-                            },
+                        const Icon(
+                          Icons.event_available_rounded,
+                          size: 17,
+                          color: Color(0xFF168A57),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${DateFormat.yMd().format(controller.selectedDay)}  •  ${controller.timeSelected ?? ManagerStrings.chooseTime}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: ManagerFontFamily.fontFamily,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF227350),
+                            ),
                           ),
                         ),
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: ManagerColors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(
-                                  ManagerRadius.r50,
-                                ),
-                                topRight: Radius.circular(
-                                  ManagerRadius.r50,
-                                ),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: ManagerHeight.h20,
-                                left: ManagerWidth.w30,
-                                right: ManagerWidth.w30,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    ManagerStrings.availableTime,
-                                    style: getBoldTextStyle(
-                                      fontSize: ManagerFontSize.s18,
-                                      color: ManagerColors.black,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: size.height * ManagerOpacity.op0_01,
-                                  ),
-                                  controller.isAvailableTimesLoading
-                                      ? SizedBox(
-                                          height: size.height *
-                                              ManagerOpacity.op0_12,
-                                          child: ListView.separated(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: 6,
-                                            separatorBuilder: (_, __) =>
-                                                SizedBox(
-                                              width: ManagerWidth.w10,
-                                            ),
-                                            itemBuilder: (_, __) =>
-                                                const ShimmerTimeCircle(),
-                                          ),
-                                        )
-                                      : controller.availableTimes.isEmpty
-                                          ? Center(
-                                              child: Text(
-                                                ManagerStrings
-                                                    .noAvailableTimeForTheDoctorToday,
-                                                style: getBoldTextStyle(
-                                                  fontSize: ManagerFontSize.s20,
-                                                  color: ManagerColors
-                                                      .primaryColor,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            )
-                                          : SizedBox(
-                                              height: size.height *
-                                                  ManagerOpacity.op0_12,
-                                              child: ListView.separated(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemCount: controller
-                                                    .availableTimes.length,
-                                                separatorBuilder: (context,
-                                                        index) =>
-                                                    SizedBox(
-                                                        width:
-                                                            ManagerWidth.w10),
-                                                itemBuilder: (context, index) {
-                                                  return InkWell(
-                                                    onTap: () {
-                                                      controller
-                                                              .appointmentTime =
-                                                          controller
-                                                                  .rawAvailableTimes[
-                                                              index];
-                                                      controller
-                                                          .onSelectTime(index);
-                                                    },
-                                                    child: Container(
-                                                      height: size.height *
-                                                          ManagerOpacity.op0_1,
-                                                      width: size.width *
-                                                          ManagerOpacity.op0_2,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: controller
-                                                                    .appointmentTimeSelectedIndex ==
-                                                                index
-                                                            ? ManagerColors
-                                                                .primaryColor
-                                                            : ManagerColors
-                                                                .primaryColor
-                                                                .withOpacity(
-                                                                ManagerOpacity
-                                                                    .op0_1,
-                                                              ),
-                                                      ),
-                                                      child: Center(
-                                                        child: Text(
-                                                          controller
-                                                                  .availableTimes[
-                                                              index],
-                                                          style:
-                                                              getMediumTextStyle(
-                                                            fontSize:
-                                                                ManagerFontSize
-                                                                    .s14,
-                                                            color: controller.appointmentTimeSelectedIndex ==
-                                                                    index
-                                                                ? ManagerColors
-                                                                    .white
-                                                                : ManagerColors
-                                                                    .primaryColor,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                  Text(
-                                    ManagerStrings.reminderMeBefore,
-                                    style: getBoldTextStyle(
-                                      fontSize: ManagerFontSize.s18,
-                                      color: ManagerColors.black,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: size.height * ManagerOpacity.op0_05,
-                                    child: ListView.separated(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount:
-                                          controller.reminderTimes.length,
-                                      separatorBuilder: (context, index) =>
-                                          SizedBox(
-                                        width: ManagerWidth.w10,
-                                      ),
-                                      itemBuilder: (context, index) {
-                                        return InkWell(
-                                          onTap: () {
-                                            controller
-                                                .onReminderTimesPressed(index ,controller.appointmentTime);
-                                          },
-                                          child: Container(
-                                            height: size.height *
-                                                ManagerOpacity.op0_1,
-                                            width: size.width *
-                                                ManagerOpacity.op0_2,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: controller
-                                                          .reminderTimeIndex ==
-                                                      index
-                                                  ? ManagerColors.primaryColor
-                                                  : ManagerColors.primaryColor
-                                                      .withOpacity(
-                                                      ManagerOpacity.op0_1,
-                                                    ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                '${controller.reminderTimes[index]}\n${ManagerStrings.minit}',
-                                                style: getMediumTextStyle(
-                                                  fontSize: ManagerFontSize.s11,
-                                                  color: controller
-                                                              .reminderTimeIndex ==
-                                                          index
-                                                      ? ManagerColors.white
-                                                      : ManagerColors
-                                                          .primaryColor,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  // SizedBox(
-                                  //   height: size.height * ManagerOpacity.op0_01,
-                                  // ),
-                                  mainButton(
-                                    onPressed: () {
-                                      controller.addAppointment();
-                                    },
-                                    buttonText: ManagerStrings.confirm,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
                       ],
                     ),
-                  ],
-                ),
-              )
-            ],
-          );
-        },
-      ),
+                  ),
+                  const SizedBox(height: 18),
+                  ModernActionButton(
+                    label: ManagerStrings.confirm,
+                    icon: Icons.check_rounded,
+                    enabled: controller.timeSelected != null &&
+                        !controller.isSubmitting,
+                    onPressed: controller.addAppointment,
+                  ),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.center,
+                    child: TextButton(
+                      onPressed: controller.onPreviousPressed,
+                      child: Text(
+                        ManagerStrings.editYourAppointment,
+                        style: TextStyle(
+                          fontFamily: ManagerFontFamily.fontFamily,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF168A57),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _sectionLabel(IconData icon, String label) {
+    return Row(
+      children: [
+        Icon(icon, size: 17, color: const Color(0xFF168A57)),
+        const SizedBox(width: 7),
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: ManagerFontFamily.fontFamily,
+            fontSize: 14.5,
+            fontWeight: FontWeight.w900,
+            color: const Color(0xFF154734),
+          ),
+        ),
+      ],
     );
   }
 }

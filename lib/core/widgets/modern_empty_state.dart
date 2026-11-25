@@ -7,6 +7,7 @@ Widget modernEmptyState({
   required String subtitle,
   required String buttonText,
   required VoidCallback onPressed,
+  IconData buttonIcon = Icons.search_rounded,
 }) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
@@ -46,7 +47,7 @@ Widget modernEmptyState({
           const SizedBox(height: 22),
           ElevatedButton.icon(
             onPressed: onPressed,
-            icon: const Icon(Icons.search_rounded, size: 18, color: Colors.white),
+            icon: Icon(buttonIcon, size: 18, color: Colors.white),
             label: Text(
               buttonText,
               style: TextStyle(

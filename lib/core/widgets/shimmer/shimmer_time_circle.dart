@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../resources/manager_colors.dart';
 
 class ShimmerTimeCircle extends StatelessWidget {
   const ShimmerTimeCircle({super.key});
@@ -8,15 +7,14 @@ class ShimmerTimeCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: ManagerColors.primaryColor.withOpacity(0.3),
-      highlightColor: ManagerColors.primaryColor.withOpacity(0.1),
+      baseColor: const Color(0xFFE5F0EA),
+      highlightColor: const Color(0xFFF7FCF9),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        height: 60,
-        width: 60,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
+        width: 88,
+        height: 54,
+        decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
     );

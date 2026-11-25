@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:tender/core/resources/manager_colors.dart';
-import 'package:tender/core/resources/manager_font_size.dart';
-import 'package:tender/core/resources/manager_opacity.dart';
+import 'package:tender/core/resources/manager_fonts.dart';
 import 'package:tender/core/resources/manager_strings.dart';
-import 'package:tender/core/resources/manager_styles.dart';
-import 'package:tender/core/resources/manager_width.dart';
-import 'package:tender/core/widgets/main_button.dart';
-
-import '../../../../../core/resources/manager_images.dart';
+import 'package:tender/core/widgets/glass_card.dart';
+import 'package:tender/core/widgets/modern_action_button.dart';
 
 Widget successAppointmentDialog({
   required String doctorName,
@@ -18,97 +12,142 @@ Widget successAppointmentDialog({
   required dynamic Function()? onDonePressed,
   required void Function()? onEditAppointmentPressed,
 }) {
-  var size = MediaQuery.of(Get.context!).size;
+  final Size size = MediaQuery.of(Get.context!).size;
+
   return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+    backgroundColor: Colors.transparent,
+    insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+    child: GlassCard(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 26),
+      borderRadius: 28,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: size.width * 0.22,
+            height: size.width * 0.22,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.topStart,
+                end: AlignmentDirectional.bottomEnd,
+                colors: [Color(0xFF9CE0C0), Color(0xFFE6F7EE)],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x33168A57),
+                  blurRadius: 16,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.check_rounded,
+              size: 44,
+              color: Color(0xFF168A57),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            ManagerStrings.thankYou,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: ManagerFontFamily.fontFamily,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: const Color(0xFF154734),
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            ManagerStrings.yourAppointmentSuccessful,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: ManagerFontFamily.fontFamily,
+              fontSize: 14,
+              color: const Color(0xFF6E7B76),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF7F0),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${ManagerStrings.youBookAnAppointmentWith} $doctorName',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: ManagerFontFamily.fontFamily,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF154734),
+                  ),
+                ),
+                const SizedBox(height: 9),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.calendar_today_rounded,
+                      size: 15,
+                      color: Color(0xFF168A57),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      appointmentDate,
+                      style: TextStyle(
+                        fontFamily: ManagerFontFamily.fontFamily,
+                        fontSize: 12.5,
+                        color: const Color(0xFF227350),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 15,
+                      color: Color(0xFF168A57),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      appointmentTime,
+                      style: TextStyle(
+                        fontFamily: ManagerFontFamily.fontFamily,
+                        fontSize: 12.5,
+                        color: const Color(0xFF227350),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          ModernActionButton(
+            label: ManagerStrings.done,
+            icon: Icons.check_rounded,
+            onPressed: onDonePressed,
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: onEditAppointmentPressed,
+            child: Text(
+              ManagerStrings.editYourAppointment,
+              style: TextStyle(
+                fontFamily: ManagerFontFamily.fontFamily,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF168A57),
+              ),
+            ),
+          ),
+        ],
       ),
-      backgroundColor: ManagerColors.white,
-      child: SizedBox(
-        height: size.height * ManagerOpacity.op0_8,
-        width: size.width * 1.0,
-        child: Padding(
-          padding: EdgeInsets.all(
-            ManagerWidth.w20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: size.width * ManagerOpacity.op0_5,
-                height: size.height * ManagerOpacity.op0_2,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: ManagerColors.primaryColor
-                      .withOpacity(ManagerOpacity.op0_2),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(
-                    ManagerWidth.w30,
-                  ),
-                  child: SvgPicture.asset(
-                    ManagerImages.like,
-                    height: size.height * ManagerOpacity.op0_1,
-                    width: size.width * ManagerOpacity.op0_3,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_02,
-              ),
-              Text(
-                ManagerStrings.thankYou,
-                style: getBoldTextStyle(
-                  fontSize: ManagerFontSize.s40,
-                  color: ManagerColors.black,
-                ),
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_01,
-              ),
-              Text(
-                ManagerStrings.yourAppointmentSuccessful,
-                style: getRegularTextStyle(
-                  fontSize: ManagerFontSize.s16,
-                  color: ManagerColors.blueBell,
-                ),
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_02,
-              ),
-              Text(
-                '${ManagerStrings.youBookAnAppointmentWith} '
-                '$doctorName ${ManagerStrings.on} '
-                ' $appointmentDate \n ${ManagerStrings.at} '
-                '$appointmentTime ',
-                style: getRegularTextStyle(
-                  fontSize: ManagerFontSize.s20,
-                  color: ManagerColors.blueBell,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_02,
-              ),
-              mainButton(
-                onPressed: onDonePressed,
-                buttonText: ManagerStrings.done,
-              ),
-              SizedBox(
-                height: size.height * ManagerOpacity.op0_02,
-              ),
-              TextButton(
-                onPressed: onEditAppointmentPressed,
-                child: Text(
-                  ManagerStrings.editYourAppointment,
-                  style: getRegularTextStyle(
-                    fontSize: ManagerFontSize.s15,
-                    color: ManagerColors.blueBell,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ));
+    ),
+  );
 }

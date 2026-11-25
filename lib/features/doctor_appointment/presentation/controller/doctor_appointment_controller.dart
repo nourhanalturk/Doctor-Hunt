@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_state_render_dialog/flutter_state_render_dialog.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,157 +36,245 @@ class DoctorAppointmentController extends GetxController {
   DateTime focusedDay = DateTime.now();
   DateTime selectedDay = DateTime.now();
   DateTime appointmentTime = DateTime.now();
-  int appointmentTimeSelectedIndex = 0;
+  int appointmentTimeSelectedIndex = -1;
   String? timeSelected;
   String? imageUrl;
+  String? uploadedImagePath;
 
   List<int> reminderTimes = [30, 40, 25, 10, 35];
   int reminderTimeIndex = 0;
 
-  onReminderTimesPressed(int index, DateTime appointmentTimeReminder) {
+  XFile? selectedImage;
+  bool isUploadingImage = false;
+  bool isSubmitting = false;
+
+  List<String> availableTimes = [];
+  List<DateTime> rawAvailableTimes = [];
+  bool isAvailableTimesLoading = false;
+  String _requestedDate = '';
+
+  void _showError(String message) {
+    if (Get.context == null) {
+      Get.snackbar(ManagerStrings.tryAgain, message,
+          snackPosition: SnackPosition.TOP);
+      return;
+    }
+    dialogRender(
+      context: Get.context!,
+      stateRenderType: StateRenderType.popUpErrorState,
+      message: message,
+      title: '',
+    );
+  }
+
+  /// The reminder is only stored now; it is scheduled after a successful booking.
+  onReminderTimesPressed(int index) {
+    if (index < 0 || index >= reminderTimes.length) return;
     reminderTimeIndex = index;
-    setReminderNotification(reminderTimes[index], appointmentTimeReminder);
     update();
   }
 
-  setReminderNotification(
-      int reminderMinutesBefore, DateTime appointmentTimeUtc) async {
-    await NotiService().initNotification();
-
-    final now = DateTime.now();
-    final testTime = now.add(Duration(seconds: 15));
-
-    // 3. Schedule with hardcoded values
-    await NotiService().scheduleNotification();
-
-    print('Notification scheduled for ${testTime.toString()}');
+  Future<void> _scheduleReminder() async {
+    await NotiService.shared.scheduleAppointmentReminder(
+      appointmentTime: appointmentTime,
+      minutesBefore: reminderTimes[reminderTimeIndex],
+      title: ManagerStrings.appointment,
+      body:
+          '${ManagerStrings.youBookAnAppointmentWith} $doctorName ${ManagerStrings.at} $timeSelected',
+    );
   }
 
   onSelectTime(int index) {
+    if (index < 0 || index >= rawAvailableTimes.length) return;
     appointmentTimeSelectedIndex = index;
+    appointmentTime = rawAvailableTimes[index];
     timeSelected = availableTimes[index];
     update();
   }
 
   onFocusDayChanged(DateTime newSelectedDay, DateTime newFocusDate) {
+    final DateTime now = DateTime.now();
+    final DateTime startOfToday = DateTime(now.year, now.month, now.day);
+    if (newSelectedDay.isBefore(startOfToday)) return;
+
     focusedDay = newFocusDate;
     selectedDay = newSelectedDay;
-    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
-    getAvailableTimes(doctorId: doctorId, date: formattedDate);
+    timeSelected = null;
+    appointmentTimeSelectedIndex = -1;
+    appointmentTime = startOfToday;
     update();
-  }
 
-  onNextPressed() {
-    pageController.nextPage(
-      duration: const Duration(milliseconds: Constants.outBoardingDurationTime),
-      curve: Curves.bounceInOut,
+    getAvailableTimes(
+      doctorId: doctorId,
+      date: DateFormat('yyyy-MM-dd').format(selectedDay),
     );
   }
 
-  XFile? selectedImage;
-  String? uploadedImagePath;
+  onNextPressed() {
+    if (!_validatePatientData()) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    pageController.nextPage(
+      duration: const Duration(milliseconds: Constants.outBoardingDurationTime),
+      curve: Curves.easeInOut,
+    );
+    update();
+  }
+
+  onPreviousPressed() {
+    if (!pageController.hasClients) return;
+    pageController.previousPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+    update();
+  }
+
+  bool _validatePatientData() {
+    final String name = patientName.text.trim();
+    if (name.isEmpty) {
+      _showError(ManagerStrings.patientNameRequired);
+      return false;
+    }
+
+    final String phone = contactNumber.text.trim();
+    if (phone.isEmpty) {
+      _showError(ManagerStrings.contactNumberRequired);
+      return false;
+    }
+    if (phone.replaceAll(RegExp(r'\D'), '').length < 7) {
+      _showError(ManagerStrings.invalidContactNumber);
+      return false;
+    }
+    return true;
+  }
 
   pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    final imageFile = File(image!.path);
-    imageUrl = await uploadImage('patient-images', imageFile);
     if (image == null) return;
-    if (imageUrl != null) {
+
+    isUploadingImage = true;
+    update();
+
+    final String? uploadedUrl = await uploadImage(
+      'patient-images',
+      File(image.path),
+    );
+
+    isUploadingImage = false;
+    if (uploadedUrl != null) {
       selectedImage = image;
+      imageUrl = uploadedUrl;
     }
     update();
   }
 
   addAppointment() async {
-    if (timeSelected == null) {
-      dialogRender(
-        context: Get.context!,
-        stateRenderType: StateRenderType.popUpErrorState,
-        message: ManagerStrings.youHaveToSelectATime,
-        title: '',
-      );
+    if (isSubmitting) return;
+
+    if (timeSelected == null || availableTimes.isEmpty) {
+      _showError(ManagerStrings.youHaveToSelectATime);
+      return;
+    }
+    if (!_validatePatientData()) {
+      if (pageController.hasClients) {
+        pageController.previousPage(
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeInOut,
+        );
+      }
       return;
     }
 
+    isSubmitting = true;
+    update();
+
     final userIdResult = await instance<GetCurrentUserIdUseCase>().execute();
-    final patientUid = userIdResult.fold(
+    final String? patientUid = userIdResult.fold(
       (failure) {
-        dialogRender(
-          context: Get.context!,
-          stateRenderType: StateRenderType.popUpErrorState,
-          message: failure.message,
-          title: '',
-        );
+        _showError(failure.message);
         return null;
       },
       (id) => id,
     );
 
     if (patientUid == null) {
+      isSubmitting = false;
+      update();
       return;
     }
 
     AddAppointmentUseCase useCase = instance<AddAppointmentUseCase>();
-
-    (await useCase.execute(
+    final result = await useCase.execute(
       AddAppointmentRequest(
         doctorId: doctorId,
         patientId: patientUid,
         appointmentTime: appointmentTime,
-        contactNumber: contactNumber.text,
-        dependentName: patientName.text,
+        contactNumber: contactNumber.text.trim(),
+        dependentName: patientName.text.trim(),
         dependentImageUrl: imageUrl.onNull(),
       ),
-    ))
-        .fold(
-      (l) {
-        dialogRender(
-          context: Get.context!,
-          stateRenderType: StateRenderType.popUpErrorState,
-          message: l.message,
-          title: '',
-        );
+    );
+
+    result.fold(
+      (failure) {
+        isSubmitting = false;
+        update();
+        _showError(failure.message);
       },
       (r) async {
-        bool isTimeUpdated = await updateTheDoctorAvailableTime();
+        final bool isTimeUpdated = await updateTheDoctorAvailableTime();
+        await _scheduleReminder();
 
-        if (isTimeUpdated) {
-          Get.dialog(
-            successAppointmentDialog(
-              doctorName: doctorName,
-              appointmentDate:
-                  DateFormat('yyyy-MM-dd').format(selectedDay).toString(),
-              appointmentTime: timeSelected.onNull(),
-              onDonePressed: () {
-                Get.toNamed(Routes.mainHome);
-              },
-              onEditAppointmentPressed: () {
-                Get.back();
-              },
-            ),
+        isSubmitting = false;
+        update();
+
+        if (!isTimeUpdated) {
+          Get.snackbar(
+            ManagerStrings.cacheError,
+            ManagerStrings.slotSyncError,
+            snackPosition: SnackPosition.TOP,
           );
-        } else {
-          updateTheDoctorAvailableTime();
         }
+
+        Get.dialog(
+          successAppointmentDialog(
+            doctorName: doctorName,
+            appointmentDate: DateFormat('yyyy-MM-dd').format(selectedDay),
+            appointmentTime: timeSelected.onNull(),
+            onDonePressed: finishBooking,
+            onEditAppointmentPressed: () => Get.back(),
+          ),
+        );
       },
     );
   }
 
-  List<String> availableTimes = [];
-  List<DateTime> rawAvailableTimes = [];
+  void finishBooking() {
+    Get.back();
+    if (Get.isRegistered<DoctorAppointmentController>()) {
+      Get.delete<DoctorAppointmentController>();
+    }
+    Get.offAllNamed(Routes.mainHome);
+  }
 
-  bool isAvailableTimesLoading = false;
-  Future<List<String>> getAvailableTimes({
+  getAvailableTimes({
     required int doctorId,
     required String date,
   }) async {
+    _requestedDate = date;
     isAvailableTimesLoading = true;
+    availableTimes = [];
+    rawAvailableTimes = [];
+    timeSelected = null;
+    appointmentTimeSelectedIndex = -1;
     update();
 
     final result = await instance<GetAvailableTimesUseCase>().execute(
       GetAvailableTimesRequest(doctorId: doctorId, date: date),
     );
+
+    if (_requestedDate != date) return;
 
     result.fold(
       (failure) {
@@ -196,17 +285,24 @@ class DoctorAppointmentController extends GetxController {
         );
       },
       (times) {
-        rawAvailableTimes = times.map((time) => time.dateTime).toList();
+        final DateTime now = DateTime.now();
+        rawAvailableTimes = times
+            .map((time) => time.dateTime)
+            .where((time) => time.isAfter(now))
+            .toList();
         availableTimes = rawAvailableTimes
             .map((e) => DateFormat('h:mm a').format(e))
             .toList();
-        timeSelected = availableTimes.isNotEmpty ? availableTimes[0] : null;
+        if (rawAvailableTimes.isNotEmpty) {
+          appointmentTime = rawAvailableTimes.first;
+          timeSelected = availableTimes.first;
+          appointmentTimeSelectedIndex = 0;
+        }
       },
     );
 
     isAvailableTimesLoading = false;
     update();
-    return availableTimes;
   }
 
   Future<bool> updateTheDoctorAvailableTime() async {
@@ -219,14 +315,7 @@ class DoctorAppointmentController extends GetxController {
     );
 
     return result.fold(
-      (failure) {
-        Get.snackbar(
-          ManagerStrings.cacheError,
-          ManagerStrings.failedToUpdateDoctorsAvailableTime,
-          snackPosition: SnackPosition.TOP,
-        );
-        return false;
-      },
+      (failure) => false,
       (isUpdated) => isUpdated,
     );
   }
@@ -239,8 +328,15 @@ class DoctorAppointmentController extends GetxController {
     doctorImage = CacheData.getDoctorImage();
     doctorRating = CacheData.getDoctorRating();
     doctorCoastPerHour = CacheData.getDoctorCoastPerHour();
-    String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    getAvailableTimes(doctorId: doctorId, date: formattedDate);
+
+    final DateTime now = DateTime.now();
+    selectedDay = DateTime(now.year, now.month, now.day);
+    focusedDay = selectedDay;
+    appointmentTime = selectedDay;
+    getAvailableTimes(
+      doctorId: doctorId,
+      date: DateFormat('yyyy-MM-dd').format(selectedDay),
+    );
     super.onInit();
   }
 
@@ -251,8 +347,10 @@ class DoctorAppointmentController extends GetxController {
     contactNumber.dispose();
     selectedImage = null;
     uploadedImagePath = null;
-    appointmentTimeSelectedIndex = 0;
-    appointmentTime = DateTime.now();
+    appointmentTimeSelectedIndex = -1;
+    timeSelected = null;
+    isSubmitting = false;
+    isUploadingImage = false;
     availableTimes.clear();
     rawAvailableTimes.clear();
     super.onClose();

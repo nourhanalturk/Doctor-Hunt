@@ -27,36 +27,49 @@ class DoctorDetailsController extends GetxController {
   List<String> services = [];
 
   bool isLoading = false;
+  bool hasError = false;
+  bool isChatLoading = false;
   LatLng coordinates = const LatLng(31.9539, 35.9106);
 
-  convertLocationString(String location) {
-    List<String> parts = location.split(',');
-    double lat = double.parse(parts[0].trim());
-    double lng = double.parse(parts[1].trim());
+  /// Safely reads "lat,lng" without ever crashing the details screen.
+  LatLng convertLocationString(String? location) {
+    if (location == null || location.trim().isEmpty) return coordinates;
 
-    coordinates = LatLng(lat, lng);
-    return coordinates;
+    final List<String> parts = location.split(',');
+    if (parts.length < 2) return coordinates;
+
+    final double? lat = double.tryParse(parts[0].trim());
+    final double? lng = double.tryParse(parts[1].trim());
+    if (lat == null || lng == null) return coordinates;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return coordinates;
+
+    return LatLng(lat, lng);
   }
 
   getDoctorDetails() async {
     isLoading = true;
+    hasError = false;
     update();
-    final DoctorDetailsUseCase useCase = instance<DoctorDetailsUseCase>();
 
-    (await useCase.execute(
-            DoctorDetailsRequest(doctorId: CacheData.getDoctorDetailsId())))
-        .fold(
-      (l) {
+    final DoctorDetailsUseCase useCase = instance<DoctorDetailsUseCase>();
+    final result = await useCase.execute(
+      DoctorDetailsRequest(doctorId: CacheData.getDoctorDetailsId()),
+    );
+
+    result.fold(
+      (failure) {
+        hasError = true;
         isLoading = false;
         update();
       },
       (data) {
         details = data;
-        SubHomeDataModel? homeData = data.homeData;
-        doctorName = homeData!.name.onNull();
-        doctorSpeciality = homeData.speciality.onNull();
-        rating = homeData.rating.onNull();
-        image = homeData.image.onNull();
+        final SubHomeDataModel? homeData = data.homeData;
+
+        doctorName = homeData?.name.onNull() ?? '';
+        doctorSpeciality = homeData?.speciality.onNull() ?? '';
+        rating = homeData?.rating.onNull() ?? 0;
+        image = homeData?.image.onNull() ?? '';
 
         CacheData.setDoctorName(doctorName);
         CacheData.setDoctorSpeciality(doctorSpeciality);
@@ -67,16 +80,20 @@ class DoctorDetailsController extends GetxController {
         runningPatients = data.runningPatients.onNull();
         outgoingPatients = data.outgoingPatients.onNull();
         patients = data.patients.onNull();
-
         values = [runningPatients, outgoingPatients, patients];
+
         coastPerHour = data.coastPerHour.onNull();
-        services = data.services!;
+        services = List<String>.from(data.services ?? const <String>[]);
+        location = data.location;
         coordinates = convertLocationString(data.location);
+        hasError = false;
         isLoading = false;
         update();
       },
     );
   }
+
+  retryGetDoctorDetails() => getDoctorDetails();
 
   List<String> patientStatus = [
     ManagerStrings.running,
@@ -85,15 +102,33 @@ class DoctorDetailsController extends GetxController {
   ];
 
   navigateToAppointment() {
+    if (doctorId == 0) return;
     Get.toNamed(Routes.doctorAppointment);
   }
 
   createOrOpenChat() async {
+    if (doctorId == 0 || isChatLoading) return;
+
+    isChatLoading = true;
+    update();
+
     CreateOrOpenChatUseCase useCase = instance<CreateOrOpenChatUseCase>();
-    (await useCase.execute(doctorId)).fold(
-      (l) {},
+    final result = await useCase.execute(doctorId);
+
+    isChatLoading = false;
+    result.fold(
+      (failure) {
+        Get.snackbar(
+          ManagerStrings.tryAgain,
+          failure.message,
+          snackPosition: SnackPosition.TOP,
+        );
+        update();
+      },
       (chat) {
+        CacheData.setDoctorName(doctorName);
         CacheData.setChatUid(chat.chatUid);
+        update();
         Get.toNamed(Routes.messages);
       },
     );

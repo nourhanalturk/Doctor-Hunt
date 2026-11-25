@@ -491,6 +491,21 @@ class ManagerStrings {
   static String get startConversation => tr('startConversation');
   static String get typeYourMessage => tr('typeYourMessage');
   static String get online => tr('online');
+  static String get doctorDetailsSubtitle => tr('doctorDetailsSubtitle');
+  static String get clinicLocation => tr('clinicLocation');
+  static String get chatWithDoctor => tr('chatWithDoctor');
+  static String get yourDetails => tr('yourDetails');
+  static String get dateAndTime => tr('dateAndTime');
+  static String get chooseDate => tr('chooseDate');
+  static String get chooseTime => tr('chooseTime');
+  static String get patientNameRequired => tr('patientNameRequired');
+  static String get contactNumberRequired => tr('contactNumberRequired');
+  static String get invalidContactNumber => tr('invalidContactNumber');
+  static String get pleaseLoginFirst => tr('pleaseLoginFirst');
+  static String get retry => tr('retry');
+  static String get couldNotLoadDoctor => tr('couldNotLoadDoctor');
+  static String get slotSyncError => tr('slotSyncError');
+  static String get patientPhoto => tr('patientPhoto');
 
 
 

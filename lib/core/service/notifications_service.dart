@@ -3,39 +3,39 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-
 class NotiService {
+  NotiService();
+
+  static final NotiService shared = NotiService();
+
   final notificationsPlugin = FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
 
   bool get isInitialized => _isInitialized;
 
-// INITIALIZE
   Future<void> initNotification() async {
-    if (_isInitialized) return; // prevent re-initialization
+    if (_isInitialized) return;
 
     tz.initializeTimeZones();
     final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(currentTimeZone));
-// prepare android init settings
+
     const initSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
-// prepare ios init settings
     const initSettingsIOS = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-// init settings
     const initSettings = InitializationSettings(
       android: initSettingsAndroid,
       iOS: initSettingsIOS,
     );
 
     await notificationsPlugin.initialize(initSettings);
+    _isInitialized = true;
   }
 
   NotificationDetails notificationDetails() {
@@ -46,7 +46,7 @@ class NotiService {
         channelDescription: 'Daily Notification Channel',
         importance: Importance.max,
         priority: Priority.high,
-      ), // AndroidNotificationDetails
+      ),
       iOS: DarwinNotificationDetails(),
     );
   }
@@ -56,7 +56,7 @@ class NotiService {
     String? title,
     String? body,
   }) async {
-    return notificationsPlugin.show(
+    await notificationsPlugin.show(
       id,
       title,
       body,
@@ -64,53 +64,41 @@ class NotiService {
     );
   }
 
-  // Future<void> scheduleReminderNotification({
-  //   required int hour,
-  //   required int reminderMinutesBefore,
-  //   required String title,
-  //   required String body,
-  //   int id = 0,
-  // }) async {
-  //   final now = tz.TZDateTime.now(tz.local);
-  //   var scheduledDate = tz.TZDateTime(
-  //     tz.local,
-  //     now.year,
-  //     now.month,
-  //     now.day,
-  //     hour,
-  //     reminderMinutesBefore,
-  //   );
-  //   notificationsPlugin.zonedSchedule(
-  //     id,
-  //     title,
-  //     body,
-  //     scheduledDate,
-  //     notificationDetails(),
-  //     androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-  //   );
-  // }
-  Future<void> scheduleNotification() async {
-    final scheduledTime = tz.TZDateTime.now(tz.local).add(Duration(seconds: 15));
+  /// Schedules one reminder at [minutesBefore] the appointment time.
+  /// Past times are ignored instead of firing immediately.
+  Future<void> scheduleAppointmentReminder({
+    required DateTime appointmentTime,
+    required int minutesBefore,
+    required String title,
+    required String body,
+  }) async {
+    await initNotification();
+
+    final DateTime scheduledTime =
+        appointmentTime.subtract(Duration(minutes: minutesBefore));
+    if (!scheduledTime.isAfter(DateTime.now())) return;
 
     await notificationsPlugin.zonedSchedule(
-      1,
-      'موعدك',
-      'لديك إشعار مجدول',
-      scheduledTime,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'channel_id',
-          'الإشعارات المهمة',
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle, // ← الإعداد الجديد
+      appointmentTime.millisecondsSinceEpoch % 1000000000,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledTime, tz.local),
+      notificationDetails(),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
-  Future<void> cancelNotifications()async{
-   await notificationsPlugin.cancelAll();
+
+  /// Kept for compatibility with older callers.
+  Future<void> scheduleNotification() async {
+    await scheduleAppointmentReminder(
+      appointmentTime: DateTime.now().add(const Duration(seconds: 15)),
+      minutesBefore: 0,
+      title: 'Appointment',
+      body: 'You have an upcoming appointment',
+    );
   }
 
-
+  Future<void> cancelNotifications() async {
+    await notificationsPlugin.cancelAll();
+  }
 }
