@@ -117,6 +117,26 @@ class HomeController extends GetxController {
         .toList();
   }
 
+  List<HomeModel> searchDoctors() {
+    final String query = searchController.text.trim().toLowerCase();
+    final List<HomeModel> all = <HomeModel>[
+      ...popularDoctors,
+      ...featuredDoctors,
+    ];
+
+    if (query.isEmpty) {
+      return all;
+    }
+
+    final Set<int> seen = <int>{};
+    return all.where((doctor) {
+      if (!seen.add(doctor.id)) {
+        return false;
+      }
+      return (doctor.name?.toLowerCase() ?? '').contains(query);
+    }).toList();
+  }
+
   String _mapFailureToMessage(Failure failure) {
     if (failure is ServerFailure) {
       return '${ManagerStrings.serverError}: ${failure.message}';

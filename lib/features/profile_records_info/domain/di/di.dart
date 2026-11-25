@@ -15,8 +15,6 @@ import 'package:tender/features/profile_records_info/domain/usecase/get_patient_
 import '../../presentation/controller/profile_records_info_controller.dart';
 
 initProfileRecordsInfo() {
-  disposeHome();
-
   if (!GetIt.I.isRegistered<CurrentUserDataSource>()) {
     instance.registerLazySingleton<CurrentUserDataSource>(
       () => CurrentUserDataSourceImpl(instance<SupabaseClient>()),

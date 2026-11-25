@@ -6,6 +6,7 @@ import 'package:tender/features/chat/domain/di/di.dart';
 import 'package:tender/features/home/domain/di/di.dart';
 import 'package:tender/features/main_container/domain/di/di.dart';
 import 'package:tender/features/main_home/presentation/controller/main_home_controller.dart';
+import 'package:tender/features/settings/domain/di/di.dart';
 import '../../../../config/di/di.dart';
 import '../../../favorites/domain/di/di.dart';
 import '../../../home/presentation/controller/home_controller.dart';
@@ -73,16 +74,21 @@ disposeMainHomeRequest() {
 }
 
 /// Feature-local DI switching that used to live inside [MainHomeController].
-initMainHomeTab(int index) {
+void initMainHomeTab(int index) {
   switch (index) {
     case 0:
       initHome();
-    case 1:
       initFavorites();
-    case 2:
+      break;
+    case 1:
       initBookings();
+      break;
+    case 2:
+      initFavorites();
+      break;
     case 3:
-      initChats();
+      initSettings();
+      break;
   }
 }
 

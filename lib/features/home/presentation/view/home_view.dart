@@ -1,420 +1,230 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:tender/core/cache/app_cache.dart';
 import 'package:tender/core/extensions/extensions.dart';
-import 'package:tender/core/resources/manager_font_size.dart';
-import 'package:tender/core/resources/manager_font_weight.dart';
-import 'package:tender/core/resources/manager_height.dart';
-import 'package:tender/core/resources/manager_icons.dart';
-import 'package:tender/core/resources/manager_images.dart';
-import 'package:tender/core/resources/manager_json.dart';
-import 'package:tender/core/resources/manager_opacity.dart';
 import 'package:tender/core/resources/manager_strings.dart';
-import 'package:tender/core/resources/manager_styles.dart';
-import 'package:tender/core/resources/manager_width.dart';
-import 'package:tender/core/widgets/categories_container.dart';
 import 'package:tender/core/widgets/content_card.dart';
 import 'package:tender/core/widgets/doctor_info_card.dart';
+import 'package:tender/core/widgets/home_care_header.dart';
+import 'package:tender/core/widgets/home_search_panel.dart';
+import 'package:tender/core/widgets/home_section_header.dart';
 import 'package:tender/core/widgets/main_background.dart';
-import 'package:tender/core/widgets/main_button.dart';
+import 'package:tender/features/home/domain/model/home_data_model.dart';
 import 'package:tender/features/home/presentation/controller/home_controller.dart';
+
 import '../../../../core/resources/manager_colors.dart';
-import '../../../../core/resources/manager_radius.dart';
-import '../../../../core/routes/routes.dart';
-import '../../../../core/widgets/shimmer/home_view_shimmer.dart';
-import '../../domain/model/categories_model.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
+
     return GetBuilder<HomeController>(
       builder: (controller) {
         SystemChrome.setSystemUIOverlayStyle(
           const SystemUiOverlayStyle(
-            statusBarColor: ManagerColors.primaryColor,
-            statusBarIconBrightness: Brightness.light,
+            statusBarColor: ManagerColors.transparent,
+            statusBarIconBrightness: Brightness.dark,
           ),
         );
+
+        final bool hasData = controller.popularDoctors.isNotEmpty ||
+            controller.featuredDoctors.isNotEmpty;
+        final bool isSearching =
+            controller.searchController.text.trim().isNotEmpty;
+        final List<HomeModel> results = controller.searchDoctors();
+
         return RefreshIndicator(
           onRefresh: () => controller.homeRequest(),
           child: AppScaffold(
-            body: controller.popularDoctors.isEmpty  ? const Center(child: CircularProgressIndicator(color: ManagerColors.primaryColor,)): ListView(
-
+            body: ListView(
+              padding: const EdgeInsets.only(bottom: 96),
               children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      height: size.height * ManagerOpacity.op0_15,
-                      decoration: BoxDecoration(
-                        color: ManagerColors.primaryColor,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(
-                            ManagerRadius.r25,
-                          ),
-                          bottomRight: Radius.circular(
-                            ManagerRadius.r25,
-                          ),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).padding.top +
-                              ManagerHeight.h30,
-                          left: ManagerHeight.h30,
-                          right: ManagerHeight.h30,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${ManagerStrings.hi} ${controller.userName}',
-                                  style: getRegularTextStyle(
-                                    fontSize: ManagerFontSize.s20,
-                                    color: ManagerColors.white,
-                                  ),
-                                ),
-                                Text(
-                                  ManagerStrings.findYourDoctor,
-                                  style: getBoldTextStyle(
-                                    fontSize: ManagerFontSize.s25,
-                                    color: ManagerColors.white,
-                                  ),
-                                )
-                              ],
-                            ),
-                            InkWell(
-                              onTap: () {
-                                controller.navigateToProfileInfo();
-
-                              },
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: CircleAvatar(
-                                  radius: ManagerRadius.r30,
-                                  backgroundImage: NetworkImage(
-                                    controller.userImage,
-                                  ),
-                                ),
-                              ),
+                HomeCareHeader(
+                  userName: controller.userName,
+                  userImage: controller.userImage,
+                  onProfileTap: controller.navigateToProfileInfo,
+                  searchPanel: HomeSearchPanel(
+                    controller: controller.searchController,
+                    onChanged: (_) => controller.update(),
+                    onClear: () {
+                      controller.onSearchButtonClearPressed();
+                      controller.update();
+                    },
+                  ),
+                ),
+                if (!hasData)
+                  SizedBox(
+                    height: size.height * 0.5,
+                    child: Center(
+                      child: controller.isLoading
+                          ? const CircularProgressIndicator(
+                              color: Color(0xFF168A57),
                             )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: -30,
-                      left: 0,
-                      right: 0,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          width: size.width * ManagerOpacity.op0_85,
-                          height: ManagerHeight.h55,
-                          decoration: BoxDecoration(
-                            color: ManagerColors.white,
-                            borderRadius: BorderRadius.circular(
-                              ManagerRadius.r12,
-                            ),
-                          ),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(
-                                ManagerIcons.search,
-                                color: ManagerColors.blueBell,
-                              ),
-                              hintText: ManagerStrings.search,
-                              hintStyle: TextStyle(
-                                fontSize: ManagerFontSize.s19,
-                                color: ManagerColors.blueBell,
-                              ),
-                              suffixIcon: IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  ManagerIcons.clear,
-                                  color: ManagerColors.blueBell,
-                                ),
+                          : Text(
+                              ManagerStrings.noContent,
+                              style: const TextStyle(
+                                color: const Color(0xFF7E8A86),
+                                fontSize: 14,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
                     ),
-                  ],
-                ),
-                SizedBox(
-                  height: size.height * ManagerOpacity.op0_09,
-                ),
-                InkWell(
-                    onTap: () {
-                      Get.toNamed(Routes.healthCheckups);
-                    },
-                    child:
-                        Center(
-                      child: Container(
-                        height: size.height * 0.09,
-                        width: size.width * 0.7,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              height: size.height * 0.08,
-                              width: size.width * 0.7,
-                              decoration: BoxDecoration(
-                                color: ManagerColors.white,
-                                borderRadius:
-                                    BorderRadius.circular(ManagerRadius.r20),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(ManagerWidth.w15),
-                                child: Text(
-                                  ManagerStrings
-                                      .newFullBodyHealthCheckupsAreAvailable,
-                                  style: TextStyle(
-                                    fontSize: ManagerFontSize.s14,
-                                    color: ManagerColors.black,
-                                    fontWeight: ManagerFontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            // Fixed Positioned widget:
-                            Positioned(
-                              top: -28,
-                              left: (size.width * 0.7) / 2 - 25,
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: const BoxDecoration(
-                                  color: ManagerColors.scaffoldColor,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Lottie.asset(
-                                  ManagerJson.readMore,
-                                  fit: BoxFit.cover,
-                                  repeat: true,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )),
-                SizedBox(
-                  height: size.height * ManagerOpacity.op0_01,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    ManagerStrings.liveDoctors,
-                    style: getBoldTextStyle(
-                      fontSize: ManagerFontSize.s22,
-                      color: ManagerColors.lightBlack,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: size.height * ManagerOpacity.op0_01,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ManagerWidth.w20,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      controller.testNowReminder();
-                    },
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        height: size.height * ManagerOpacity.op0_25,
-                        width: size.width * ManagerOpacity.op0_33,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            ManagerRadius.r20,
-                          ),
-                          child: Stack(
-                            children: [
-                              Image.asset(
-                                ManagerImages.liveDoctorImage,
-                              ),
-                              Container(
-                                height: size.height * ManagerOpacity.op0_25,
-                                width: size.width * ManagerOpacity.op0_33,
-                                decoration: BoxDecoration(
-                                    color: ManagerColors.white
-                                        .withOpacity(ManagerOpacity.op0_3)),
-                              ),
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      left: size.width * ManagerOpacity.op0_19,
-                                      top: ManagerHeight.h9,
-                                    ),
-                                    child: Container(
-                                      height:
-                                          size.height * ManagerOpacity.op0_03,
-                                      width: size.width * ManagerOpacity.op0_12,
-                                      decoration: BoxDecoration(
-                                        color: ManagerColors.redColor,
-                                        borderRadius: BorderRadius.circular(
-                                          ManagerRadius.r4,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            height: size.height *
-                                                ManagerOpacity.op0_01,
-                                            width: size.width *
-                                                ManagerOpacity.op0_05,
-                                            decoration: const BoxDecoration(
-                                                color: ManagerColors.white,
-                                                shape: BoxShape.circle),
-                                          ),
-                                          Text(
-                                            ManagerStrings.live,
-                                            style: TextStyle(
-                                              fontSize: ManagerFontSize.s13,
-                                              color: ManagerColors.white,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: size.height * ManagerOpacity.op0_07,
-                                  ),
-                                  SvgPicture.asset(
-                                    ManagerImages.playIcon,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: size.height * ManagerOpacity.op0_03,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ManagerWidth.w20,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(
-                      controller.categories.length,
-                      (index) {
-                        CategoriesModel model = controller.categories[index];
-                        return categoriesContainer(
-                          firstColor: model.firstColor,
-                          secondColor: model.secondColor,
-                          icon: model.icon,
-                          onTap: model.onTap,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: size.height * ManagerOpacity.op0_02,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ManagerWidth.w20,
-                  ),
-                  child: Text(
-                    ManagerStrings.popularDoctors,
-                    style: getBoldTextStyle(
-                      fontSize: ManagerFontSize.s22,
-                      color: ManagerColors.lightBlack,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ManagerWidth.w10,
-                  ),
-                  child: SizedBox(
-                    height: size.height * ManagerOpacity.op0_4,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.popularDoctors.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var model = controller.popularDoctors[index];
-                        return contentCard(
-                          image: model.image.onNull(),
-                          doctorName: model.name.onNull(),
-                          onTap: () {
-                            controller.navigateToDoctorDetails(model.id);
-                          },
-                          doctorSpecialty: model.specialty,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: size.height * ManagerOpacity.op0_07,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    ManagerStrings.featureDoctors,
-                    style: getBoldTextStyle(
-                      fontSize: ManagerFontSize.s22,
-                      color: ManagerColors.lightBlack,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ManagerWidth.w5,
-                  ),
-                  child: SizedBox(
-                    height: size.height * ManagerOpacity.op0_33,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.featuredDoctors.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var model = controller.featuredDoctors[index];
-                        return doctorInfoCard(
-                          doctorId: model.id,
-                          onTap: () {
-                            controller.navigateToDoctorDetails(model.id);
-                          },
-                          onFavoritePressed: () {},
-                          doctorRate: model.rating.toString(),
-                          doctorName: model.name,
-                          coastByHour: model.coastPerHour.onNull().toString(),
-                          image: model.image,
-                        );
-                      },
-                    ),
-                  ),
-                )
+                  )
+                else if (isSearching)
+                  _SearchResults(
+                    results: results,
+                    controller: controller,
+                  )
+                else
+                  _HomeSections(controller: controller),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _HomeSections extends StatelessWidget {
+  const _HomeSections({required this.controller});
+
+  final HomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        HomeSectionHeader(
+          title: ManagerStrings.popularDoctors,
+          topPadding: 44,
+          titleFontSize: 20,
+          actionFontSize: 13.5,
+        ),
+        SizedBox(
+          height: 252,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsetsDirectional.only(start: 20, end: 20),
+            itemCount: controller.popularDoctors.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              final model = controller.popularDoctors[index];
+              return contentCard(
+                image: model.image.onNull(),
+                doctorName: model.name.onNull(),
+                doctorSpecialty: model.specialty,
+                onTap: () => controller.navigateToDoctorDetails(model.id),
+                width: 200,
+                height: 252,
+                imageHeight: 145,
+                doctorId: model.id,
+                doctorRate: model.rating.toString(),
+                coastByHour: model.coastPerHour.onNull().toString(),
+              );
+            },
+          ),
+        ),
+        HomeSectionHeader(title: ManagerStrings.featureDoctors),
+        _DoctorGrid(
+          doctors: controller.featuredDoctors,
+          controller: controller,
+          cardHeight: 196,
+        ),
+      ],
+    );
+  }
+}
+
+class _SearchResults extends StatelessWidget {
+  const _SearchResults({required this.results, required this.controller});
+
+  final List<HomeModel> results;
+  final HomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    if (results.isEmpty) {
+      return SizedBox(
+        height: 260,
+        child: Center(
+          child: Text(
+            ManagerStrings.noContent,
+            style: const TextStyle(
+              color: const Color(0xFF7E8A86),
+              fontSize: 14,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        HomeSectionHeader(
+          title: ManagerStrings.search,
+          topPadding: 44,
+          titleFontSize: 19,
+        ),
+        _DoctorGrid(
+          doctors: results,
+          controller: controller,
+          cardHeight: 196,
+        ),
+      ],
+    );
+  }
+}
+
+class _DoctorGrid extends StatelessWidget {
+  const _DoctorGrid({
+    required this.doctors,
+    required this.controller,
+    required this.cardHeight,
+  });
+
+  final List<HomeModel> doctors;
+  final HomeController controller;
+  final double cardHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    const double gap = 14;
+    const double side = 20;
+
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: side, end: side),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double itemWidth = (constraints.maxWidth - gap) / 2;
+          return Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: doctors.map((model) {
+              return SizedBox(
+                width: itemWidth,
+                height: cardHeight,
+                child: doctorInfoCard(
+                  doctorId: model.id,
+                  onTap: () => controller.navigateToDoctorDetails(model.id),
+                  onFavoritePressed: () {},
+                  doctorRate: model.rating.toString(),
+                  doctorName: model.name,
+                  coastByHour: model.coastPerHour.onNull().toString(),
+                  image: model.image.onNull(),
+                  cardHeight: cardHeight,
+                  cardWidth: itemWidth,
+                  imageRadius: 14,
+                ),
+              );
+            }).toList(),
+          );
+        },
+      ),
     );
   }
 }
