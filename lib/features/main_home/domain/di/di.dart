@@ -87,7 +87,7 @@ void initMainHomeTab(int index) {
       initFavorites();
       break;
     case 3:
-      initSettings();
+      initChats();
       break;
   }
 }

@@ -218,5 +218,19 @@
   "doctorHuntAppsPrivacyAndPolicy": "سياسة خصوصية تطبيق البحث عن طبيب",
   "appointmentBookedByYou": "موعد حجزته أنت",
   "patientRecords": "السجلات الطبية",
-  "appointmentPending": "قيد الانتظار"
+  "appointmentPending": "قيد الانتظار",
+  "chatWithYourDoctorsHere": "تحدث مع أطبائك هنا",
+  "myAppointments": "مواعيدي",
+  "noAppointmentsYet": "لا توجد مواعيد بعد",
+  "bookYourFirstAppointment": "احجز أول موعد لك",
+  "findDoctors": "ابحث عن أطباء",
+  "upcomingAppointments": "المواعيد القادمة",
+  "viewDetails": "عرض التفاصيل",
+  "noChatsYet": "لا توجد محادثات بعد",
+  "myChats": "محادثاتي",
+  "favoriteDoctorsSubtitle": "كل أطبائك المحفوظين في مكان واحد",
+  "doctors": "أطباء",
+  "startConversation": "ابدأ المحادثة",
+  "typeYourMessage": "اكتب رسالتك...",
+  "online": "متصل"
 }

@@ -1,130 +1,244 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tender/core/cache/app_cache.dart';
-import 'package:tender/core/resources/manager_colors.dart';
-import 'package:tender/core/resources/manager_icons.dart';
-import 'package:tender/core/resources/manager_opacity.dart';
+import 'package:tender/core/resources/manager_fonts.dart';
+import 'package:tender/core/resources/manager_strings.dart';
+import 'package:tender/core/widgets/chat_background.dart';
+import 'package:tender/core/widgets/glass_card.dart';
 import 'package:tender/core/widgets/main_background.dart';
-import 'package:tender/core/widgets/text_field.dart';
+import 'package:tender/core/widgets/modern_message_bubble.dart';
 import 'package:tender/features/messages/domain/di/di.dart';
 import 'package:tender/features/messages/presentation/controller/messages_controller.dart';
-import 'package:tender/features/messages/presentation/view/widget/message_item.dart';
-
-import '../../../../core/resources/manager_font_size.dart';
-import '../../../../core/resources/manager_height.dart';
-import '../../../../core/resources/manager_radius.dart';
-import '../../../../core/resources/manager_styles.dart';
 
 class MessagesView extends StatelessWidget {
   const MessagesView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-
     return GetBuilder<MessagesController>(
       builder: (controller) {
         return AppScaffold(
-          body: Column(
+          body: Stack(
             children: [
-              Container(
-                height: size.height * ManagerOpacity.op0_09,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: ManagerColors.primaryColor,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(
-                      ManagerRadius.r25,
-                    ),
-                    bottomRight: Radius.circular(
-                      ManagerRadius.r25,
-                    ),
+              const ChatBackground(),
+              Column(
+                children: [
+                  _buildHeader(controller),
+                  Expanded(
+                    child: controller.messages.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.chat_bubble_outline_rounded,
+                                  size: 42,
+                                  color: Color(0xFF168A57),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  ManagerStrings.startConversation,
+                                  style: TextStyle(
+                                    fontFamily: ManagerFontFamily.fontFamily,
+                                    fontSize: 14,
+                                    color: const Color(0xFF6E7B76),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: controller.scrollController,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            itemCount: controller.messages.length,
+                            itemBuilder: (context, index) {
+                              final model = controller.messages[index];
+                              return modernMessageBubble(
+                                isSender: model.isSender,
+                                message: model.message,
+                              );
+                            },
+                          ),
                   ),
-                ),
-                child: Center(
-                  child: Row(
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            disposeMessages();
-                            Get.back();
-                          },
-                          icon: Icon(
-                            ManagerIcons.arrowBackIos,
-                            color: ManagerColors.white,
-                          )),
-                      Text(
-                        CacheData.doctorName,
-                        style: getBoldTextStyle(
-                          fontSize: ManagerFontSize.s25,
-                          color: ManagerColors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: controller.messages.length,
-                  itemBuilder: (context, index) {
-                    var model = controller.messages[index];
-                    return messageItem(
-                      isSender: model.isSender,
-                      message: model.message,
-                    );
-                  },
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: size.height * ManagerOpacity.op0_12,
-                decoration: BoxDecoration(
-                  color: ManagerColors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(
-                      ManagerRadius.r50,
-                    ),
-                    topRight: Radius.circular(
-                      ManagerRadius.r50,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: size.width * ManagerOpacity.op0_7,
-                      height: size.height * ManagerOpacity.op0_09,
-                      child: textField(
-                        controller: controller.messageController,
-                        borderColor: ManagerColors.primaryColor,
-                      ),
-                    ),
-                    Container(
-                      width: size.width * ManagerOpacity.op0_2,
-                      height: size.height * ManagerOpacity.op0_05,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ManagerColors.primaryColor,
-                      ),
-                      child: IconButton(
-                        onPressed: () {
-                          controller.sendMessage();
-                        },
-                        icon: const Icon(
-                          Icons.send,
-                          color: ManagerColors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  _buildComposer(controller),
+                ],
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildHeader(MessagesController controller) {
+    return Container(
+      height: 116,
+      padding: const EdgeInsetsDirectional.only(start: 16, end: 16, top: 8),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: AlignmentDirectional.topEnd,
+          end: AlignmentDirectional.bottomStart,
+          colors: [Color(0xFF9CE0C0), Color(0xFFE6F7EE)],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x12154734),
+            blurRadius: 18,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          InkWell(
+            onTap: () {
+              disposeMessages();
+              Get.back();
+            },
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0x99FFFFFF),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x1F154734),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18,
+                color: Color(0xFF154734),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  CacheData.doctorName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: ManagerFontFamily.fontFamily,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF154734),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF2ECC7E),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      ManagerStrings.online,
+                      style: TextStyle(
+                        fontFamily: ManagerFontFamily.fontFamily,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF227350),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComposer(MessagesController controller) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(
+        start: 16,
+        end: 16,
+        bottom: 16,
+        top: 6,
+      ),
+      child: GlassCard(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        borderRadius: 999,
+        blur: 10,
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: controller.messageController,
+                onSubmitted: (_) => controller.sendMessage(),
+                style: TextStyle(
+                  fontFamily: ManagerFontFamily.fontFamily,
+                  fontSize: 14.5,
+                  color: const Color(0xFF1E2422),
+                ),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  hintText: ManagerStrings.typeYourMessage,
+                  hintStyle: TextStyle(
+                    fontFamily: ManagerFontFamily.fontFamily,
+                    fontSize: 14,
+                    color: const Color(0xFF7E8A86),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: controller.sendMessage,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF168A57), Color(0xFF32A577)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x33168A57),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.send_rounded,
+                  size: 19,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

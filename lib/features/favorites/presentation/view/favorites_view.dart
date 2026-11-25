@@ -1,90 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tender/core/resources/manager_radius.dart';
-import 'package:tender/core/resources/manager_width.dart';
 import 'package:tender/core/routes/routes.dart';
-import 'package:tender/core/widgets/empty_state.dart';
+import 'package:tender/core/resources/manager_strings.dart';
+import 'package:tender/core/widgets/favorite_doctor_card.dart';
 import 'package:tender/core/widgets/main_background.dart';
-import 'package:tender/core/widgets/shimmer/favorites_shimmer_view.dart';
+import 'package:tender/core/widgets/modern_care_header.dart';
+import 'package:tender/core/widgets/modern_empty_state.dart';
 import 'package:tender/features/favorites/presentation/controller/favorites_controller.dart';
-import '../../../../core/resources/manager_height.dart';
-import '../../../../core/resources/manager_images.dart';
-import '../../../../core/resources/manager_opacity.dart';
-import '../../../../core/resources/manager_strings.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
-import '../../../../core/widgets/doctor_info_card.dart';
 
 class FavoritesView extends StatelessWidget {
   const FavoritesView({super.key});
 
+  Widget _doctorGrid({
+    required int count,
+    required IndexedWidgetBuilder itemBuilder,
+  }) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      itemCount: count,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.78,
+      ),
+      itemBuilder: itemBuilder,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(Get.context!).size;
-
     return GetBuilder<FavoritesController>(
       builder: (controller) {
-        return controller.isLoading
-            ? FavoritesShimmerView()
-            : controller.favorites.isEmpty
-                ? EmptyStateWidget(
-                    appBarTitle: ManagerStrings.favoriteDoctors,
+        return RefreshIndicator(
+          onRefresh: () async => controller.loadFavoriteDoctors(),
+          child: AppScaffold(
+            body: ListView(
+              padding: const EdgeInsets.only(bottom: 96),
+              children: [
+                ModernCareHeader(
+                  icon: Icons.favorite_border_rounded,
+                  title: ManagerStrings.favoriteDoctors,
+                  subtitle: ManagerStrings.favoriteDoctorsSubtitle,
+                  countLabel:
+                      '${controller.doctors.length} ${ManagerStrings.doctors}',
+                ),
+                const SizedBox(height: 28),
+                if (controller.isLoading)
+                  _doctorGrid(
+                    count: 4,
+                    itemBuilder: (_, __) => favoriteDoctorShimmer(),
+                  ),
+                if (!controller.isLoading && controller.favorites.isEmpty)
+                  modernEmptyState(
+                    icon: Icons.favorite_border_rounded,
                     title: ManagerStrings.thereIsNoFavorites,
-                    subtitle: ManagerStrings.searchDoctors,
+                    subtitle: ManagerStrings.favoriteDoctorsSubtitle,
                     buttonText: ManagerStrings.searchDoctors,
-                    onPressed: () {
-                      Get.toNamed(Routes.home);
+                    onPressed: () => Get.toNamed(Routes.home),
+                  ),
+                if (!controller.isLoading && controller.favorites.isNotEmpty)
+                  _doctorGrid(
+                    count: controller.doctors.length,
+                    itemBuilder: (_, index) {
+                      final model = controller.doctors[index];
+                      return favoriteDoctorCard(
+                        name: model.name,
+                        specialty: model.specialty,
+                        imageUrl: model.image,
+                      );
                     },
-                    svgAssetPath: ManagerImages.medicalRecords,
-                  )
-                : RefreshIndicator(
-                    onRefresh: () {
-                     return controller.loadFavoriteDoctors();
-                    },
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(
-                            ManagerHeight.h20,
-                          ),
-                          child: customAppBar(
-                            appBarTitle: ManagerStrings.favoriteDoctors,
-                          ),
-                        ),
-                        Expanded(
-                          child: GridView.builder(
-                            padding: EdgeInsets.all(
-                              ManagerWidth.w20,
-                            ),
-                            itemCount: controller.doctors.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: ManagerWidth.w10,
-                              mainAxisSpacing: ManagerWidth.w10,
-                              childAspectRatio: ManagerOpacity.op0_7,
-                            ),
-                            itemBuilder: (context, index) {
-                              var model = controller.doctors[index];
-                              return doctorInfoCard(
-                                doctorId: model.doctorId,
-                                onTap: () {},
-                                cardHeight: size.height * ManagerOpacity.op0_4,
-                                imageRadius: ManagerRadius.r70,
-                                onFavoritePressed: () {},
-                                cardWidth: size.width * ManagerOpacity.op0_8,
-                                doctorRate: '',
-                                doctorName: model.name,
-                                coastByHour: '',
-                                image: model.image,
-                                doctorSpeciality: model.specialty,
-                                isFavInfoShown: true,
-                              );
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  );
+                  ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

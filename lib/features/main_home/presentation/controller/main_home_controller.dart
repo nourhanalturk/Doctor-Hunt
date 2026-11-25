@@ -5,9 +5,9 @@ import 'package:get/get.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/routes/routes.dart';
 import 'package:tender/features/bookings/presentation/view/bookings_view.dart';
+import 'package:tender/features/chat/presentation/view/chats_view.dart';
 import 'package:tender/features/main_container/presentation/controller/main_container_controller.dart';
 import 'package:tender/features/main_container/presentation/view/main_container_view.dart';
-import 'package:tender/features/settings/presentation/view/settings_view.dart';
 import '../../../favorites/presentation/view/favorites_view.dart';
 import '../../domain/di/di.dart';
 import '../../domain/model/auth_state_model.dart';
@@ -41,8 +41,8 @@ class MainHomeController extends GetxController {
           index: 2,
         ),
         buildBottomNavItem(
-          icon: Icons.settings_outlined,
-          label: 'Settings',
+          icon: Icons.chat_bubble_outline_rounded,
+          label: 'Chats',
           index: 3,
         ),
       ];
@@ -76,7 +76,7 @@ class MainHomeController extends GetxController {
     const MainContainerView(),
     const BookingsView(),
     const FavoritesView(),
-    const SettingsView(),
+    const ChatsView(),
   ];
 
   void listenToAuthChanges() async {

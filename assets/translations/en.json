@@ -231,5 +231,10 @@
   "upcomingAppointments": "Upcoming Appointments",
   "viewDetails": "View Details",
   "noChatsYet": "No Chats Yet",
-  "myChats": "My Chats"
+  "myChats": "My Chats",
+  "favoriteDoctorsSubtitle": "All the doctors you saved, in one place",
+  "doctors": "doctors",
+  "startConversation": "Start the conversation",
+  "typeYourMessage": "Type your message...",
+  "online": "Online"
 }

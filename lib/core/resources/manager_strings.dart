@@ -486,6 +486,11 @@ class ManagerStrings {
   static String get findDoctors => tr('findDoctors');
   static String get upcomingAppointments => tr('upcomingAppointments');
   static String get viewDetails => tr('viewDetails');
+  static String get favoriteDoctorsSubtitle => tr('favoriteDoctorsSubtitle');
+  static String get doctors => tr('doctors');
+  static String get startConversation => tr('startConversation');
+  static String get typeYourMessage => tr('typeYourMessage');
+  static String get online => tr('online');
 
 
 

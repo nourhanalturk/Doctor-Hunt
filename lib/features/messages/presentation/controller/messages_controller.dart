@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tender/config/di/di.dart';
 import 'package:tender/core/cache/app_cache.dart';
@@ -12,11 +12,24 @@ import 'package:tender/features/messages/domain/usecase/send_message_usecase.dar
 
 class MessagesController extends GetxController {
   TextEditingController messageController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   late String chatUid;
   List<MessageModel> messages = [];
 
   StreamSubscription<MessageModel>? _newMessagesSubscription;
   bool _isClosed = false;
+
+  void _scrollToBottom() {
+    if (!scrollController.hasClients) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isClosed || !scrollController.hasClients) return;
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOut,
+      );
+    });
+  }
 
   fetchMessages() async {
     chatUid = CacheData.chatUid;
@@ -27,15 +40,16 @@ class MessagesController extends GetxController {
         if (_isClosed) return;
         messages = response;
         update();
+        _scrollToBottom();
       },
     );
   }
 
   sendMessage() async {
-    print(chatUid);
+    if (_isClosed) return;
 
-    String messageText = messageController.text;
-    if (messageText == null) return;
+    final String messageText = messageController.text.trim();
+    if (messageText.isEmpty) return;
 
     SendMessageRequest request = SendMessageRequest(
       chatUid: chatUid,
@@ -50,6 +64,7 @@ class MessagesController extends GetxController {
       (r) {
         if (_isClosed) return;
         messageController.clear();
+        _scrollToBottom();
       },
     );
   }
@@ -68,6 +83,7 @@ class MessagesController extends GetxController {
               if (_isClosed) return;
               messages.add(newMessage);
               update();
+              _scrollToBottom();
             });
           },
         );
@@ -88,9 +104,9 @@ class MessagesController extends GetxController {
   void onClose() {
     _isClosed = true;
     _newMessagesSubscription?.cancel();
-    // Keep messageController alive: disposeMessages() runs from the view's
-    // back button while the TextField is still mounted, and an in-flight
-    // sendMessage()/realtime update can still reference it.
+    // Keep messageController and scrollController alive: the back button calls
+    // disposeMessages() while the view is still mounted, and in-flight sends or
+    // realtime updates can still reference them during the pop animation.
     super.onClose();
   }
 }
